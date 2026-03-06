@@ -71,7 +71,11 @@ Plans:
   1. MEGNet model via matgl trains successfully (in a separate conda environment if necessary) and produces predictions for all target properties
   2. MEGNet uses its own appropriate hyperparameters (LR ~1e-4, ~1000 epochs, larger batches) independent of CGCNN settings
   3. Evaluation uses the exact same compositional folds and test set as CGCNN and baselines, with results saved in the same artifact format
-**Plans:** TBD
+**Plans:** 2 plans
+
+Plans:
+- [ ] 04-01-PLAN.md — MEGNet wrapper module, YAML config, and test scaffolding
+- [ ] 04-02-PLAN.md — MEGNet training orchestrator with Lightning integration and CLI
 
 ### Phase 5: Evaluation and Benchmarking
 **Goal:** All models are rigorously compared with publication-quality figures and the full pipeline is runnable end-to-end from CLI
@@ -107,7 +111,7 @@ Plans:
 | 1. Data Pipeline and Project Foundation | 3/3 | Complete   | 2026-03-06 |
 | 2. Featurization and Baseline Models | 3/3 | Complete   | 2026-03-06 |
 | 3. CGCNN Implementation | 1/2 | In progress | - |
-| 4. MEGNet Implementation | 0/0 | Not started | - |
+| 4. MEGNet Implementation | 0/2 | Not started | - |
 | 5. Evaluation and Benchmarking | 0/0 | Not started | - |
 | 6. Dashboard and Documentation | 0/0 | Not started | - |
 
