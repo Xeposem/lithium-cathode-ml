@@ -11,7 +11,7 @@ See: .planning/PROJECT.md (updated 2026-03-05)
 
 | Phase | Name | Status | Requirements |
 |-------|------|--------|-------------|
-| 1 | Data Pipeline and Project Foundation | In Progress (1/3 plans) | DATA-01, DATA-02, DATA-03, DATA-04, DATA-05, DATA-06, REPR-01, REPR-02, REPR-03 |
+| 1 | Data Pipeline and Project Foundation | Complete (3/3 plans) | DATA-01, DATA-02, DATA-03, DATA-04, DATA-05, DATA-06, REPR-01, REPR-02, REPR-03 |
 | 2 | Featurization and Baseline Models | Pending | FEAT-01, FEAT-02, FEAT-03, FEAT-04, MODL-03, MODL-04 |
 | 3 | CGCNN Implementation | Pending | MODL-01, MODL-05, MODL-06, MODL-07 |
 | 4 | MEGNet Implementation | Pending | MODL-02 |
@@ -21,9 +21,9 @@ See: .planning/PROJECT.md (updated 2026-03-05)
 ## Current Phase
 
 **Phase 1: Data Pipeline and Project Foundation**
-Status: In Progress
-Plans: 1/3
-Current Plan: 01-02
+Status: Complete
+Plans: 3/3
+Current Plan: Done
 
 ## Accumulated Context
 
@@ -31,6 +31,13 @@ Current Plan: 01-02
 - DataCache.load() returns only data field, not wrapper (clean API for fetchers)
 - MD5 hash for cache keys (deterministic, acceptable collision risk at project scale)
 - Explicit FileNotFoundError in load_config for clear error messages
+- Lazy import pattern for heavy science deps (mp-api, qmpy-rester) to avoid version conflicts at import time
+- OQMD structure_dict is empty dict (REST API does not return full crystal structure)
+- Electrode join via material_ids list iteration from each electrode doc
+- BDG fetcher is a CSV file downloader, not API client (BDG is not a single API)
+- Deduplication uses source priority: MP > OQMD > BDG
+- IQR outlier removal skips when fewer than 4 data points
+- Fetcher imports in fetch.py use try/except for robustness
 - Separate models per property (not multi-output) per research recommendation
 - CGCNN before MEGNet (zero dependency conflicts vs matgl/DGL risk)
 - Baselines with featurization (fast end-to-end validation)
@@ -42,7 +49,7 @@ Current Plan: 01-02
 - Phase 4 (MEGNet): matgl v1.3.0 + PyTorch compatibility untested; may need separate conda env
 - Phase 3 (CGCNN): Transfer learning from full MP (~150K entries) needs strategy research during planning
 - OQMD: qmpy_rester unmaintained since 2019; may need direct HTTP fallback
-- Battery Data Genome: Not a single API; may need custom access approach
+- Battery Data Genome: Resolved -- implemented as CSV file downloader with graceful degradation
 
 ### Blockers
 None
@@ -52,4 +59,4 @@ None
 
 ---
 *Last updated: 2026-03-06*
-*Last session: Completed 01-01-PLAN.md (project foundation, config, cache)*
+*Last session: Completed 01-02-PLAN.md (MP and OQMD data fetchers with caching)*
