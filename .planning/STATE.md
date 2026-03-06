@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_plan: Plan 01 of 02
-status: in-progress
-last_updated: "2026-03-06T21:51:06.317Z"
+current_plan: Plan 02 of 02
+status: phase-complete
+last_updated: "2026-03-06T21:58:21.128Z"
 progress:
   total_phases: 6
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 10
-  completed_plans: 9
+  completed_plans: 10
 ---
 
 # Project State
@@ -28,16 +28,16 @@ See: .planning/PROJECT.md (updated 2026-03-05)
 | 1 | Data Pipeline and Project Foundation | Complete (3/3 plans) | DATA-01, DATA-02, DATA-03, DATA-04, DATA-05, DATA-06, REPR-01, REPR-02, REPR-03 |
 | 2 | Featurization and Baseline Models | Complete (3/3 plans) | FEAT-01, FEAT-02, FEAT-03, FEAT-04, MODL-03, MODL-04 |
 | 3 | CGCNN Implementation | Complete (2/2 plans) | MODL-01, MODL-05, MODL-06, MODL-07 |
-| 4 | MEGNet Implementation | In Progress (1/2 plans) | MODL-02 |
+| 4 | MEGNet Implementation | Complete (2/2 plans) | MODL-02 |
 | 5 | Evaluation and Benchmarking | Pending | EVAL-01, EVAL-02, EVAL-03, EVAL-04, EVAL-05, REPR-04 |
 | 6 | Dashboard and Documentation | Pending | DASH-01, DASH-02, DASH-03, DASH-04, DASH-05, DASH-06, DASH-07, DOCS-01, DOCS-02, DOCS-03, DOCS-04 |
 
 ## Current Phase
 
 **Phase 4: MEGNet Implementation**
-Status: In Progress
+Status: Complete
 Plans: 2/2
-Current Plan: Plan 01 of 02
+Current Plan: Plan 02 of 02
 
 ## Accumulated Context
 
@@ -72,6 +72,7 @@ Current Plan: Plan 01 of 02
 - MEGNet-MP-2018.6.1-Eform as default pretrained model (confirmed in matgl tutorials)
 - Lazy imports for all matgl usage with centralized _import_matgl() helper
 - get_megnet_state_dict extracts model.model.state_dict() for .pt format compatibility
+- Separated _run_lightning_training for clean mocking; train_megnet_for_property accepts pre-computed indices
 
 ### Research Flags
 - Phase 4 (MEGNet): matgl v1.3.0 + PyTorch compatibility untested; may need separate conda env
@@ -87,4 +88,4 @@ None
 
 ---
 *Last updated: 2026-03-06*
-*Last session: Completed 04-01-PLAN.md (MEGNet wrapper and configuration)*
+*Last session: Completed 04-02-PLAN.md (MEGNet training orchestrator)*
