@@ -11,7 +11,7 @@ See: .planning/PROJECT.md (updated 2026-03-05)
 
 | Phase | Name | Status | Requirements |
 |-------|------|--------|-------------|
-| 1 | Data Pipeline and Project Foundation | Pending | DATA-01, DATA-02, DATA-03, DATA-04, DATA-05, DATA-06, REPR-01, REPR-02, REPR-03 |
+| 1 | Data Pipeline and Project Foundation | In Progress (1/3 plans) | DATA-01, DATA-02, DATA-03, DATA-04, DATA-05, DATA-06, REPR-01, REPR-02, REPR-03 |
 | 2 | Featurization and Baseline Models | Pending | FEAT-01, FEAT-02, FEAT-03, FEAT-04, MODL-03, MODL-04 |
 | 3 | CGCNN Implementation | Pending | MODL-01, MODL-05, MODL-06, MODL-07 |
 | 4 | MEGNet Implementation | Pending | MODL-02 |
@@ -21,12 +21,16 @@ See: .planning/PROJECT.md (updated 2026-03-05)
 ## Current Phase
 
 **Phase 1: Data Pipeline and Project Foundation**
-Status: Not started
-Plans: 0/0
+Status: In Progress
+Plans: 1/3
+Current Plan: 01-02
 
 ## Accumulated Context
 
 ### Key Decisions
+- DataCache.load() returns only data field, not wrapper (clean API for fetchers)
+- MD5 hash for cache keys (deterministic, acceptable collision risk at project scale)
+- Explicit FileNotFoundError in load_config for clear error messages
 - Separate models per property (not multi-output) per research recommendation
 - CGCNN before MEGNet (zero dependency conflicts vs matgl/DGL risk)
 - Baselines with featurization (fast end-to-end validation)
@@ -47,4 +51,5 @@ None
 None
 
 ---
-*Last updated: 2026-03-05*
+*Last updated: 2026-03-06*
+*Last session: Completed 01-01-PLAN.md (project foundation, config, cache)*

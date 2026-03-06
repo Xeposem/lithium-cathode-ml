@@ -12,7 +12,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **DATA-01**: System ingests cathode material data from Materials Project via mp-api programmatically
 - [ ] **DATA-02**: System ingests supplementary data from OQMD via REST API
 - [ ] **DATA-03**: System ingests data from Battery Data Genome datasets
-- [ ] **DATA-04**: System caches downloaded data locally to avoid repeated API calls
+- [x] **DATA-04**: System caches downloaded data locally to avoid repeated API calls
 - [ ] **DATA-05**: System preprocesses data: filters invalid structures, removes outliers, handles missing values
 - [ ] **DATA-06**: System documents every preprocessing filter applied with rationale
 
@@ -53,9 +53,9 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Reproducibility
 
-- [ ] **REPR-01**: System uses fixed random seeds across all experiments
-- [ ] **REPR-02**: System provides pinned dependency file (requirements.txt or environment.yml)
-- [ ] **REPR-03**: System uses YAML configuration files for all hyperparameters and settings
+- [x] **REPR-01**: System uses fixed random seeds across all experiments
+- [x] **REPR-02**: System provides pinned dependency file (requirements.txt or environment.yml)
+- [x] **REPR-03**: System uses YAML configuration files for all hyperparameters and settings
 - [ ] **REPR-04**: System provides CLI entry points to run full pipeline (fetch, clean, featurize, train, evaluate)
 
 ### Documentation
@@ -101,7 +101,7 @@ Deferred to future release. Tracked but not in current roadmap.
 | DATA-01 | Phase 1 | Pending |
 | DATA-02 | Phase 1 | Pending |
 | DATA-03 | Phase 1 | Pending |
-| DATA-04 | Phase 1 | Pending |
+| DATA-04 | Phase 1 | Complete |
 | DATA-05 | Phase 1 | Pending |
 | DATA-06 | Phase 1 | Pending |
 | FEAT-01 | Phase 2 | Pending |
@@ -127,9 +127,9 @@ Deferred to future release. Tracked but not in current roadmap.
 | DASH-05 | Phase 6 | Pending |
 | DASH-06 | Phase 6 | Pending |
 | DASH-07 | Phase 6 | Pending |
-| REPR-01 | Phase 1 | Pending |
-| REPR-02 | Phase 1 | Pending |
-| REPR-03 | Phase 1 | Pending |
+| REPR-01 | Phase 1 | Complete |
+| REPR-02 | Phase 1 | Complete |
+| REPR-03 | Phase 1 | Complete |
 | REPR-04 | Phase 5 | Pending |
 | DOCS-01 | Phase 6 | Pending |
 | DOCS-02 | Phase 6 | Pending |
