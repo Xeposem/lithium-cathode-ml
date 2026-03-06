@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 current_plan: Plan 02 of 03
-status: in-progress
-last_updated: "2026-03-06T04:28:00Z"
+status: executing
+last_updated: "2026-03-06T04:29:19.937Z"
 progress:
   total_phases: 6
   completed_phases: 1
   total_plans: 6
-  completed_plans: 4
+  completed_plans: 5
 ---
 
 # Project State
@@ -60,6 +60,7 @@ Current Plan: Plan 02 of 03
 - matgl v1.3.0 for MEGNet (NOT v2.0.0 -- MEGNet not yet ported to PyG in v2)
 - Matminer v0.9.3 Magpie preset produces no all-NaN columns for single-element compositions; drop logic retained for robustness
 - Two-stage GroupShuffleSplit: test first, then val from remainder with adjusted fraction
+- scipy KDTree with periodic images instead of pymatgen get_all_neighbors (Cython dtype bug on Windows)
 
 ### Research Flags
 - Phase 4 (MEGNet): matgl v1.3.0 + PyTorch compatibility untested; may need separate conda env
@@ -75,4 +76,4 @@ None
 
 ---
 *Last updated: 2026-03-06*
-*Last session: Completed 02-02-PLAN.md (Magpie composition featurizer, compositional group splitter)*
+*Last session: Completed 02-01-PLAN.md (graph featurization with Gaussian distance expansion)*
