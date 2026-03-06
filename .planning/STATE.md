@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_plan: Plan 03 of 03
-status: completed
-last_updated: "2026-03-06T05:02:50.202Z"
+current_plan: Plan 01 of 02
+status: in-progress
+last_updated: "2026-03-06T07:56:23Z"
 progress:
   total_phases: 6
   completed_phases: 2
-  total_plans: 6
-  completed_plans: 6
+  total_plans: 8
+  completed_plans: 7
 ---
 
 # Project State
@@ -19,7 +19,7 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-05)
 
 **Core value:** Accurate, reproducible prediction of cathode performance properties from crystal structure, with clear model comparison and publication-quality results
-**Current focus:** Phase 2
+**Current focus:** Phase 3
 
 ## Progress
 
@@ -27,17 +27,17 @@ See: .planning/PROJECT.md (updated 2026-03-05)
 |-------|------|--------|-------------|
 | 1 | Data Pipeline and Project Foundation | Complete (3/3 plans) | DATA-01, DATA-02, DATA-03, DATA-04, DATA-05, DATA-06, REPR-01, REPR-02, REPR-03 |
 | 2 | Featurization and Baseline Models | Complete (3/3 plans) | FEAT-01, FEAT-02, FEAT-03, FEAT-04, MODL-03, MODL-04 |
-| 3 | CGCNN Implementation | Pending | MODL-01, MODL-05, MODL-06, MODL-07 |
+| 3 | CGCNN Implementation | In Progress (1/2 plans) | MODL-01, MODL-05, MODL-06, MODL-07 |
 | 4 | MEGNet Implementation | Pending | MODL-02 |
 | 5 | Evaluation and Benchmarking | Pending | EVAL-01, EVAL-02, EVAL-03, EVAL-04, EVAL-05, REPR-04 |
 | 6 | Dashboard and Documentation | Pending | DASH-01, DASH-02, DASH-03, DASH-04, DASH-05, DASH-06, DASH-07, DOCS-01, DOCS-02, DOCS-03, DOCS-04 |
 
 ## Current Phase
 
-**Phase 2: Featurization and Baseline Models**
-Status: Complete
-Plans: 3/3
-Current Plan: Plan 03 of 03
+**Phase 3: CGCNN Implementation**
+Status: In Progress
+Plans: 1/2
+Current Plan: Plan 01 of 02
 
 ## Accumulated Context
 
@@ -63,6 +63,9 @@ Current Plan: Plan 03 of 03
 - scipy KDTree with periodic images instead of pymatgen get_all_neighbors (Cython dtype bug on Windows)
 - Lazy import for xgboost in train_baseline (only loaded when model_type='xgb')
 - Minimum 5 valid records per property to train baselines (skip otherwise)
+- Softplus activation in CGCNN FC head (smooth, differentiable, standard for regression)
+- compute_metrics accepts raw arrays (not model object) for GNN compatibility
+- Config-driven model construction pattern: build_X_from_config(model_config, features_config)
 
 ### Research Flags
 - Phase 4 (MEGNet): matgl v1.3.0 + PyTorch compatibility untested; may need separate conda env
@@ -78,4 +81,4 @@ None
 
 ---
 *Last updated: 2026-03-06*
-*Last session: Completed 02-03-PLAN.md (RF and XGBoost baseline models)*
+*Last session: Completed 03-01-PLAN.md (CGCNN model and shared utils)*

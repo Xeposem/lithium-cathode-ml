@@ -60,7 +60,7 @@ Plans:
 **Plans:** 2 plans
 
 Plans:
-- [ ] 03-01-PLAN.md — CGCNN model class, shared evaluation utils, and YAML config
+- [x] 03-01-PLAN.md — CGCNN model class, shared evaluation utils, and YAML config
 - [ ] 03-02-PLAN.md — GNNTrainer and CGCNN training orchestrator with artifacts
 
 ### Phase 4: MEGNet Implementation
@@ -106,10 +106,10 @@ Plans:
 |-------|---------------|--------|-----------|
 | 1. Data Pipeline and Project Foundation | 3/3 | Complete   | 2026-03-06 |
 | 2. Featurization and Baseline Models | 3/3 | Complete   | 2026-03-06 |
-| 3. CGCNN Implementation | 0/2 | In progress | - |
+| 3. CGCNN Implementation | 1/2 | In progress | - |
 | 4. MEGNet Implementation | 0/0 | Not started | - |
 | 5. Evaluation and Benchmarking | 0/0 | Not started | - |
 | 6. Dashboard and Documentation | 0/0 | Not started | - |
 
 ---
-*Last updated: 2026-03-05*
+*Last updated: 2026-03-06*
