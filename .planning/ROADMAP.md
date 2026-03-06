@@ -28,9 +28,9 @@
 **Plans:** 3/3 plans complete
 
 Plans:
-- [ ] 01-01-PLAN.md — Project scaffolding, config system, cache module, and dependency files
-- [ ] 01-02-PLAN.md — Materials Project and OQMD data fetchers with caching
-- [ ] 01-03-PLAN.md — Battery Data Genome fetcher, cleaning pipeline, and CLI entry point
+- [x] 01-01-PLAN.md — Project scaffolding, config system, cache module, and dependency files
+- [x] 01-02-PLAN.md — Materials Project and OQMD data fetchers with caching
+- [x] 01-03-PLAN.md — Battery Data Genome fetcher, cleaning pipeline, and CLI entry point
 
 ### Phase 2: Featurization and Baseline Models
 **Goal:** Crystal structures are converted to both graph representations and tabular features, and baseline models establish a performance floor on compositional splits
@@ -41,7 +41,12 @@ Plans:
   2. Each composition produces a Magpie descriptor vector via matminer suitable for sklearn input
   3. Train/validation/test splits group all entries sharing a reduced composition formula into the same fold, preventing polymorph leakage
   4. Random Forest and XGBoost baselines produce MAE, RMSE, and R-squared on held-out test data for each target property, with results saved as JSON artifacts
-**Plans:** TBD
+**Plans:** 3 plans
+
+Plans:
+- [ ] 02-01-PLAN.md — Crystal structure to PyG graph conversion with Gaussian edge features
+- [ ] 02-02-PLAN.md — Magpie composition featurizer and compositional group splitting
+- [ ] 02-03-PLAN.md — Random Forest and XGBoost baseline models with JSON results
 
 ### Phase 3: CGCNN Implementation
 **Goal:** CGCNN predicts cathode properties with proper training infrastructure that MEGNet will reuse
@@ -96,7 +101,7 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|---------------|--------|-----------|
 | 1. Data Pipeline and Project Foundation | 3/3 | Complete   | 2026-03-06 |
-| 2. Featurization and Baseline Models | 0/0 | Not started | - |
+| 2. Featurization and Baseline Models | 0/3 | In progress | - |
 | 3. CGCNN Implementation | 0/0 | Not started | - |
 | 4. MEGNet Implementation | 0/0 | Not started | - |
 | 5. Evaluation and Benchmarking | 0/0 | Not started | - |
