@@ -1,0 +1,24 @@
+# Cathode ML - Phase 1 Dependencies
+# All versions pinned for reproducibility (REPR-02)
+
+# Core materials science
+pymatgen==2025.10.7
+mp-api==0.45.1
+qmpy-rester==0.2.0
+
+# HTTP and data
+requests==2.31.0
+PyYAML==6.0.2
+pandas==2.2.3
+numpy==1.26.4
+tqdm==4.67.1
+python-dotenv==1.0.1
+
+# Structure utilities
+ase==3.27.0
+scipy==1.14.1
+
+# Development tools
+pytest==8.3.4
+black==24.10.0
+ruff==0.8.6

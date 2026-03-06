@@ -1,0 +1,22 @@
+name: cathode-ml
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - python=3.11
+  - pip
+  - pip:
+    - pymatgen==2025.10.7
+    - mp-api==0.45.1
+    - qmpy-rester==0.2.0
+    - requests==2.31.0
+    - PyYAML==6.0.2
+    - pandas==2.2.3
+    - numpy==1.26.4
+    - tqdm==4.67.1
+    - python-dotenv==1.0.1
+    - ase==3.27.0
+    - scipy==1.14.1
+    - pytest==8.3.4
+    - black==24.10.0
+    - ruff==0.8.6

@@ -1,0 +1,42 @@
+# Cathode ML Pipeline Configuration
+# All pipeline behavior is controlled by this file (REPR-03).
+
+random_seeds:
+  python: 42
+  numpy: 42
+
+data_sources:
+  materials_project:
+    enabled: true
+    elements_must_contain: ["Li"]
+    fields:
+      - material_id
+      - formula_pretty
+      - structure
+      - formation_energy_per_atom
+      - energy_above_hull
+      - is_stable
+      - symmetry
+    energy_above_hull_max: 0.1  # eV/atom -- only near-hull-stable materials
+
+  oqmd:
+    enabled: true
+    element_set: "Li"
+    stability_max: 0.1
+
+  battery_data_genome:
+    enabled: true
+    source_url: "https://data.nrel.gov/submissions/bdg"
+
+filters:
+  min_sites: 2
+  max_sites: 200
+  formation_energy_range: [-5.0, 0.5]  # eV/atom
+  required_properties:
+    - formation_energy_per_atom
+  remove_noble_gases: true
+  outlier_iqr_multiplier: 1.5
+
+cache:
+  directory: "data/raw"
+  use_cache: true
