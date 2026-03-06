@@ -27,8 +27,8 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [ ] **MODL-01**: System implements CGCNN using PyTorch Geometric's CGConv
 - [ ] **MODL-02**: System implements MEGNet via matgl with proper architecture matching
-- [ ] **MODL-03**: System implements Random Forest baseline with scikit-learn on Magpie features
-- [ ] **MODL-04**: System implements XGBoost/GBM baseline for additional comparison
+- [x] **MODL-03**: System implements Random Forest baseline with scikit-learn on Magpie features
+- [x] **MODL-04**: System implements XGBoost/GBM baseline for additional comparison
 - [ ] **MODL-05**: System predicts capacity, voltage, stability, and formation energy (separate models per property)
 - [ ] **MODL-06**: System trains each model with architecture-appropriate hyperparameters (not identical configs)
 - [ ] **MODL-07**: System stores model checkpoints and training artifacts as JSON/CSV
@@ -110,8 +110,8 @@ Deferred to future release. Tracked but not in current roadmap.
 | FEAT-04 | Phase 2 | Complete |
 | MODL-01 | Phase 3 | Pending |
 | MODL-02 | Phase 4 | Pending |
-| MODL-03 | Phase 2 | Pending |
-| MODL-04 | Phase 2 | Pending |
+| MODL-03 | Phase 2 | Complete |
+| MODL-04 | Phase 2 | Complete |
 | MODL-05 | Phase 3 | Pending |
 | MODL-06 | Phase 3 | Pending |
 | MODL-07 | Phase 3 | Pending |

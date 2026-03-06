@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_plan: Plan 02 of 03
-status: executing
-last_updated: "2026-03-06T04:29:19.937Z"
+current_plan: Plan 03 of 03
+status: phase-complete
+last_updated: "2026-03-06T04:58:07Z"
 progress:
   total_phases: 6
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 6
-  completed_plans: 5
+  completed_plans: 6
 ---
 
 # Project State
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-03-05)
 | Phase | Name | Status | Requirements |
 |-------|------|--------|-------------|
 | 1 | Data Pipeline and Project Foundation | Complete (3/3 plans) | DATA-01, DATA-02, DATA-03, DATA-04, DATA-05, DATA-06, REPR-01, REPR-02, REPR-03 |
-| 2 | Featurization and Baseline Models | In Progress (2/3 plans) | FEAT-01, FEAT-02, FEAT-03, FEAT-04, MODL-03, MODL-04 |
+| 2 | Featurization and Baseline Models | Complete (3/3 plans) | FEAT-01, FEAT-02, FEAT-03, FEAT-04, MODL-03, MODL-04 |
 | 3 | CGCNN Implementation | Pending | MODL-01, MODL-05, MODL-06, MODL-07 |
 | 4 | MEGNet Implementation | Pending | MODL-02 |
 | 5 | Evaluation and Benchmarking | Pending | EVAL-01, EVAL-02, EVAL-03, EVAL-04, EVAL-05, REPR-04 |
@@ -35,9 +35,9 @@ See: .planning/PROJECT.md (updated 2026-03-05)
 ## Current Phase
 
 **Phase 2: Featurization and Baseline Models**
-Status: In Progress
-Plans: 2/3
-Current Plan: Plan 02 of 03
+Status: Complete
+Plans: 3/3
+Current Plan: Plan 03 of 03
 
 ## Accumulated Context
 
@@ -61,6 +61,8 @@ Current Plan: Plan 02 of 03
 - Matminer v0.9.3 Magpie preset produces no all-NaN columns for single-element compositions; drop logic retained for robustness
 - Two-stage GroupShuffleSplit: test first, then val from remainder with adjusted fraction
 - scipy KDTree with periodic images instead of pymatgen get_all_neighbors (Cython dtype bug on Windows)
+- Lazy import for xgboost in train_baseline (only loaded when model_type='xgb')
+- Minimum 5 valid records per property to train baselines (skip otherwise)
 
 ### Research Flags
 - Phase 4 (MEGNet): matgl v1.3.0 + PyTorch compatibility untested; may need separate conda env
@@ -76,4 +78,4 @@ None
 
 ---
 *Last updated: 2026-03-06*
-*Last session: Completed 02-01-PLAN.md (graph featurization with Gaussian distance expansion)*
+*Last session: Completed 02-03-PLAN.md (RF and XGBoost baseline models)*

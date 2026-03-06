@@ -7,7 +7,7 @@
 ## Phases
 
 - [x] **Phase 1: Data Pipeline and Project Foundation** - Reproducible data ingestion, cleaning, caching, and project infrastructure (completed 2026-03-06)
-- [ ] **Phase 2: Featurization and Baseline Models** - Crystal-to-graph conversion, Magpie descriptors, and sklearn baselines that validate the pipeline end-to-end
+- [x] **Phase 2: Featurization and Baseline Models** - Crystal-to-graph conversion, Magpie descriptors, and sklearn baselines that validate the pipeline end-to-end (completed 2026-03-06)
 - [ ] **Phase 3: CGCNN Implementation** - First GNN architecture with training infrastructure, transfer learning, and multi-property prediction
 - [ ] **Phase 4: MEGNet Implementation** - Second GNN architecture via matgl, isolated to contain DGL dependency risk
 - [ ] **Phase 5: Evaluation and Benchmarking** - Rigorous cross-model comparison with publication-quality figures and CLI pipeline
@@ -41,7 +41,7 @@ Plans:
   2. Each composition produces a Magpie descriptor vector via matminer suitable for sklearn input
   3. Train/validation/test splits group all entries sharing a reduced composition formula into the same fold, preventing polymorph leakage
   4. Random Forest and XGBoost baselines produce MAE, RMSE, and R-squared on held-out test data for each target property, with results saved as JSON artifacts
-**Plans:** 2/3 plans executed
+**Plans:** 3/3 plans complete
 
 Plans:
 - [ ] 02-01-PLAN.md — Crystal structure to PyG graph conversion with Gaussian edge features
@@ -101,7 +101,7 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|---------------|--------|-----------|
 | 1. Data Pipeline and Project Foundation | 3/3 | Complete   | 2026-03-06 |
-| 2. Featurization and Baseline Models | 2/3 | In Progress|  |
+| 2. Featurization and Baseline Models | 3/3 | Complete   | 2026-03-06 |
 | 3. CGCNN Implementation | 0/0 | Not started | - |
 | 4. MEGNet Implementation | 0/0 | Not started | - |
 | 5. Evaluation and Benchmarking | 0/0 | Not started | - |
