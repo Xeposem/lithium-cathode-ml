@@ -29,9 +29,9 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **MODL-02**: System implements MEGNet via matgl with proper architecture matching
 - [x] **MODL-03**: System implements Random Forest baseline with scikit-learn on Magpie features
 - [x] **MODL-04**: System implements XGBoost/GBM baseline for additional comparison
-- [ ] **MODL-05**: System predicts capacity, voltage, stability, and formation energy (separate models per property)
+- [x] **MODL-05**: System predicts capacity, voltage, stability, and formation energy (separate models per property)
 - [x] **MODL-06**: System trains each model with architecture-appropriate hyperparameters (not identical configs)
-- [ ] **MODL-07**: System stores model checkpoints and training artifacts as JSON/CSV
+- [x] **MODL-07**: System stores model checkpoints and training artifacts as JSON/CSV
 
 ### Evaluation
 
@@ -112,9 +112,9 @@ Deferred to future release. Tracked but not in current roadmap.
 | MODL-02 | Phase 4 | Pending |
 | MODL-03 | Phase 2 | Complete |
 | MODL-04 | Phase 2 | Complete |
-| MODL-05 | Phase 3 | Pending |
+| MODL-05 | Phase 3 | Complete |
 | MODL-06 | Phase 3 | Complete |
-| MODL-07 | Phase 3 | Pending |
+| MODL-07 | Phase 3 | Complete |
 | EVAL-01 | Phase 5 | Pending |
 | EVAL-02 | Phase 5 | Pending |
 | EVAL-03 | Phase 5 | Pending |
