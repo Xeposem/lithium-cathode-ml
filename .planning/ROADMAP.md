@@ -41,7 +41,7 @@ Plans:
   2. Each composition produces a Magpie descriptor vector via matminer suitable for sklearn input
   3. Train/validation/test splits group all entries sharing a reduced composition formula into the same fold, preventing polymorph leakage
   4. Random Forest and XGBoost baselines produce MAE, RMSE, and R-squared on held-out test data for each target property, with results saved as JSON artifacts
-**Plans:** 3 plans
+**Plans:** 2/3 plans executed
 
 Plans:
 - [ ] 02-01-PLAN.md — Crystal structure to PyG graph conversion with Gaussian edge features
@@ -101,7 +101,7 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|---------------|--------|-----------|
 | 1. Data Pipeline and Project Foundation | 3/3 | Complete   | 2026-03-06 |
-| 2. Featurization and Baseline Models | 0/3 | In progress | - |
+| 2. Featurization and Baseline Models | 2/3 | In Progress|  |
 | 3. CGCNN Implementation | 0/0 | Not started | - |
 | 4. MEGNet Implementation | 0/0 | Not started | - |
 | 5. Evaluation and Benchmarking | 0/0 | Not started | - |

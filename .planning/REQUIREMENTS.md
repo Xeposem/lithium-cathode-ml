@@ -20,8 +20,8 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [ ] **FEAT-01**: System converts crystal structures to PyG graph representations (atoms as nodes, bonds as edges)
 - [ ] **FEAT-02**: System uses Gaussian distance expansion for edge features with configurable cutoff radius
-- [ ] **FEAT-03**: System generates Magpie composition-based descriptors via matminer for baseline models
-- [ ] **FEAT-04**: System implements compositional group splitting (not random) to prevent data leakage
+- [x] **FEAT-03**: System generates Magpie composition-based descriptors via matminer for baseline models
+- [x] **FEAT-04**: System implements compositional group splitting (not random) to prevent data leakage
 
 ### Models
 
@@ -106,8 +106,8 @@ Deferred to future release. Tracked but not in current roadmap.
 | DATA-06 | Phase 1 | Complete |
 | FEAT-01 | Phase 2 | Pending |
 | FEAT-02 | Phase 2 | Pending |
-| FEAT-03 | Phase 2 | Pending |
-| FEAT-04 | Phase 2 | Pending |
+| FEAT-03 | Phase 2 | Complete |
+| FEAT-04 | Phase 2 | Complete |
 | MODL-01 | Phase 3 | Pending |
 | MODL-02 | Phase 4 | Pending |
 | MODL-03 | Phase 2 | Pending |
