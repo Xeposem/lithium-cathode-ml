@@ -2,7 +2,6 @@
 
 import pytest
 import torch
-from pymatgen.core import Structure
 from torch_geometric.data import Data
 
 from cathode_ml.features.graph import (
@@ -10,20 +9,6 @@ from cathode_ml.features.graph import (
     structure_to_graph,
     validate_graph,
 )
-
-
-@pytest.fixture
-def sample_pymatgen_structure(sample_structure_dict):
-    """Convert sample_structure_dict fixture to a pymatgen Structure."""
-    return Structure.from_dict(sample_structure_dict)
-
-
-@pytest.fixture
-def features_config():
-    """Return parsed features.yaml config dict."""
-    from cathode_ml.config import load_config
-
-    return load_config("configs/features.yaml")
 
 
 # --- Gaussian expansion tests ---

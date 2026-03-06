@@ -1,5 +1,9 @@
-# Cathode ML - Phase 1 Dependencies
+# Cathode ML - Phase 1 & 2 Dependencies
 # All versions pinned for reproducibility (REPR-02)
+
+# Deep learning
+torch>=2.1.0
+torch-geometric>=2.6.0
 
 # Core materials science
 pymatgen==2025.10.7

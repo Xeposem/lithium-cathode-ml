@@ -96,6 +96,22 @@ def sample_structure_dict():
 
 
 @pytest.fixture
+def sample_pymatgen_structure(sample_structure_dict):
+    """Convert sample_structure_dict fixture to a pymatgen Structure."""
+    from pymatgen.core import Structure
+
+    return Structure.from_dict(sample_structure_dict)
+
+
+@pytest.fixture
+def features_config():
+    """Return parsed features.yaml config dict."""
+    from cathode_ml.config import load_config
+
+    return load_config("configs/features.yaml")
+
+
+@pytest.fixture
 def sample_material_record():
     """Return a MaterialRecord with test data."""
     from cathode_ml.data.schemas import MaterialRecord
