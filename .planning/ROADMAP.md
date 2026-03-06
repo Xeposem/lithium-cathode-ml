@@ -25,7 +25,12 @@
   3. A YAML config file controls all pipeline parameters (API keys, filter thresholds, random seeds) and changing a config value changes pipeline behavior
   4. `pip install -r requirements.txt` (or `conda env create`) installs all dependencies with pinned versions on a fresh machine
   5. All random operations use fixed seeds from config, producing identical outputs across runs
-**Plans:** TBD
+**Plans:** 3 plans
+
+Plans:
+- [ ] 01-01-PLAN.md — Project scaffolding, config system, cache module, and dependency files
+- [ ] 01-02-PLAN.md — Materials Project and OQMD data fetchers with caching
+- [ ] 01-03-PLAN.md — Battery Data Genome fetcher, cleaning pipeline, and CLI entry point
 
 ### Phase 2: Featurization and Baseline Models
 **Goal:** Crystal structures are converted to both graph representations and tabular features, and baseline models establish a performance floor on compositional splits
@@ -90,7 +95,7 @@
 
 | Phase | Plans Complete | Status | Completed |
 |-------|---------------|--------|-----------|
-| 1. Data Pipeline and Project Foundation | 0/0 | Not started | - |
+| 1. Data Pipeline and Project Foundation | 0/3 | Planned | - |
 | 2. Featurization and Baseline Models | 0/0 | Not started | - |
 | 3. CGCNN Implementation | 0/0 | Not started | - |
 | 4. MEGNet Implementation | 0/0 | Not started | - |
