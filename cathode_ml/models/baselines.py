@@ -7,18 +7,17 @@ Results (MAE, RMSE, R2) are saved as JSON artifacts.
 
 from __future__ import annotations
 
-import json
 import logging
 from pathlib import Path
 from typing import Any
 
 import numpy as np
 from sklearn.ensemble import RandomForestRegressor
-from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 
 from cathode_ml.data.schemas import MaterialRecord
 from cathode_ml.features.composition import featurize_compositions
 from cathode_ml.features.split import compositional_split, get_group_keys
+from cathode_ml.models.utils import compute_metrics, save_results
 
 logger = logging.getLogger(__name__)
 
@@ -91,33 +90,7 @@ def evaluate_model(
         Dict with keys: mae, rmse, r2, n_train, n_test.
     """
     y_pred = model.predict(X_test)
-    mae = float(mean_absolute_error(y_test, y_pred))
-    rmse = float(np.sqrt(mean_squared_error(y_test, y_pred)))
-    r2 = float(r2_score(y_test, y_pred))
-
-    return {
-        "mae": mae,
-        "rmse": rmse,
-        "r2": r2,
-        "n_train": int(n_train),
-        "n_test": int(len(y_test)),
-    }
-
-
-def save_results(results: dict, path: str) -> None:
-    """Save results dictionary to a JSON file.
-
-    Creates parent directories if they do not exist.
-
-    Args:
-        results: Results dictionary to serialize.
-        path: Output file path for the JSON file.
-    """
-    out_path = Path(path)
-    out_path.parent.mkdir(parents=True, exist_ok=True)
-    with open(out_path, "w") as f:
-        json.dump(results, f, indent=2)
-    logger.info("Results saved to %s", out_path)
+    return compute_metrics(y_test, y_pred, n_train)
 
 
 def run_baselines(

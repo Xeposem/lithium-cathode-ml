@@ -1,6 +1,7 @@
 """Shared pytest fixtures for cathode_ml tests."""
 
 import pytest
+import torch
 from pathlib import Path
 
 
@@ -128,3 +129,24 @@ def sample_material_record():
         is_stable=True,
         space_group=166,
     )
+
+
+@pytest.fixture
+def sample_graph_data(sample_pymatgen_structure, features_config):
+    """Create a PyG Data object from sample structure with a target value.
+
+    Returns Data with x=(3,100), edge_index=(2,E), edge_attr=(E,80), y=(1,).
+    """
+    from cathode_ml.features.graph import structure_to_graph
+
+    data = structure_to_graph(sample_pymatgen_structure, features_config)
+    data.y = torch.tensor([-2.1], dtype=torch.float32)
+    return data
+
+
+@pytest.fixture
+def cgcnn_config():
+    """Return parsed configs/cgcnn.yaml config dict."""
+    from cathode_ml.config import load_config
+
+    return load_config("configs/cgcnn.yaml")
