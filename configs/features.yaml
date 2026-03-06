@@ -1,0 +1,27 @@
+# Feature engineering configuration for cathode ML models
+# Used by all Phase 2 plans for consistent featurization
+
+graph:
+  cutoff_radius: 8.0        # Angstroms - max distance for edges
+  max_neighbors: 12         # Maximum neighbors per atom
+  gaussian:
+    dmin: 0.0               # Minimum distance for Gaussian expansion
+    dmax: 5.0               # Maximum distance for Gaussian expansion
+    num_gaussians: 80       # Number of Gaussian basis functions
+  node_feature_dim: 100     # One-hot atomic number dimension
+
+composition:
+  preset: "magpie"          # Compositional feature preset
+  nan_strategy: "median"    # How to handle NaN in compositional features
+
+splitting:
+  train_size: 0.8
+  val_size: 0.1
+  test_size: 0.1
+  group_key: "reduced_formula"  # Group by formula to prevent leakage
+
+target_properties:
+  - formation_energy_per_atom
+  - voltage
+  - capacity
+  - energy_above_hull
