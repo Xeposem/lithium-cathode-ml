@@ -59,4 +59,4 @@ None
 
 ---
 *Last updated: 2026-03-06*
-*Last session: Completed 01-02-PLAN.md (MP and OQMD data fetchers with caching)*
+*Last session: Completed 01-03-PLAN.md (BDG fetcher, cleaning pipeline, CLI entry point)*

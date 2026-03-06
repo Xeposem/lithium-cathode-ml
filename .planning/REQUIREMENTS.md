@@ -11,10 +11,10 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [x] **DATA-01**: System ingests cathode material data from Materials Project via mp-api programmatically
 - [x] **DATA-02**: System ingests supplementary data from OQMD via REST API
-- [ ] **DATA-03**: System ingests data from Battery Data Genome datasets
+- [x] **DATA-03**: System ingests data from Battery Data Genome datasets
 - [x] **DATA-04**: System caches downloaded data locally to avoid repeated API calls
-- [ ] **DATA-05**: System preprocesses data: filters invalid structures, removes outliers, handles missing values
-- [ ] **DATA-06**: System documents every preprocessing filter applied with rationale
+- [x] **DATA-05**: System preprocesses data: filters invalid structures, removes outliers, handles missing values
+- [x] **DATA-06**: System documents every preprocessing filter applied with rationale
 
 ### Featurization
 
@@ -100,10 +100,10 @@ Deferred to future release. Tracked but not in current roadmap.
 |-------------|-------|--------|
 | DATA-01 | Phase 1 | Complete |
 | DATA-02 | Phase 1 | Complete |
-| DATA-03 | Phase 1 | Pending |
+| DATA-03 | Phase 1 | Complete |
 | DATA-04 | Phase 1 | Complete |
-| DATA-05 | Phase 1 | Pending |
-| DATA-06 | Phase 1 | Pending |
+| DATA-05 | Phase 1 | Complete |
+| DATA-06 | Phase 1 | Complete |
 | FEAT-01 | Phase 2 | Pending |
 | FEAT-02 | Phase 2 | Pending |
 | FEAT-03 | Phase 2 | Pending |
