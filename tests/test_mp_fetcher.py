@@ -55,6 +55,18 @@ def _make_mock_electrode_doc(battery_id, material_ids, voltage, capacity,
     return doc
 
 
+def _setup_mock_mpr(mock_summary_docs, mock_electrode_docs):
+    """Create a mock MPRester context manager with search results."""
+    mock_mpr = MagicMock()
+    mock_mpr.materials.summary.search.return_value = mock_summary_docs
+    mock_mpr.insertion_electrodes.search.return_value = mock_electrode_docs
+    mock_mpr.__enter__ = MagicMock(return_value=mock_mpr)
+    mock_mpr.__exit__ = MagicMock(return_value=False)
+
+    mock_rester_class = MagicMock(return_value=mock_mpr)
+    return mock_mpr, mock_rester_class
+
+
 @pytest.fixture
 def mock_summary_docs(sample_structure_dict):
     """Two mock summary docs."""
@@ -118,11 +130,11 @@ class TestMPFetcherCachePath:
         ]
         mp_cache.save(cache_key, {"records": cached_records})
 
-        with patch("cathode_ml.data.mp_fetcher.MPRester") as mock_rester:
+        with patch("cathode_ml.data.mp_fetcher._get_mprester") as mock_getter:
             result = fetcher.fetch()
 
-        # MPRester should NOT have been called
-        mock_rester.assert_not_called()
+        # _get_mprester should NOT have been called (cache hit, no API needed)
+        mock_getter.assert_not_called()
         assert len(result) == 1
         assert isinstance(result[0], MaterialRecord)
         assert result[0].material_id == "mp-22526"
@@ -138,14 +150,12 @@ class TestMPFetcherAPIPath:
         from cathode_ml.data.mp_fetcher import MPFetcher
 
         fetcher = MPFetcher(mp_config, mp_cache)
+        mock_mpr, mock_rester_class = _setup_mock_mpr(
+            mock_summary_docs, mock_electrode_docs
+        )
 
-        mock_mpr = MagicMock()
-        mock_mpr.materials.summary.search.return_value = mock_summary_docs
-        mock_mpr.insertion_electrodes.search.return_value = mock_electrode_docs
-        mock_mpr.__enter__ = MagicMock(return_value=mock_mpr)
-        mock_mpr.__exit__ = MagicMock(return_value=False)
-
-        with patch("cathode_ml.data.mp_fetcher.MPRester", return_value=mock_mpr):
+        with patch("cathode_ml.data.mp_fetcher._get_mprester",
+                    return_value=mock_rester_class):
             with patch.dict("os.environ", {"MP_API_KEY": "test-key"}):
                 result = fetcher.fetch()
 
@@ -162,14 +172,12 @@ class TestMPFetcherAPIPath:
         from cathode_ml.data.mp_fetcher import MPFetcher
 
         fetcher = MPFetcher(mp_config, mp_cache)
+        mock_mpr, mock_rester_class = _setup_mock_mpr(
+            mock_summary_docs, mock_electrode_docs
+        )
 
-        mock_mpr = MagicMock()
-        mock_mpr.materials.summary.search.return_value = mock_summary_docs
-        mock_mpr.insertion_electrodes.search.return_value = mock_electrode_docs
-        mock_mpr.__enter__ = MagicMock(return_value=mock_mpr)
-        mock_mpr.__exit__ = MagicMock(return_value=False)
-
-        with patch("cathode_ml.data.mp_fetcher.MPRester", return_value=mock_mpr):
+        with patch("cathode_ml.data.mp_fetcher._get_mprester",
+                    return_value=mock_rester_class):
             with patch.dict("os.environ", {"MP_API_KEY": "test-key"}):
                 result = fetcher.fetch()
 
@@ -188,14 +196,12 @@ class TestMPFetcherAPIPath:
         from cathode_ml.data.mp_fetcher import MPFetcher
 
         fetcher = MPFetcher(mp_config, mp_cache)
+        mock_mpr, mock_rester_class = _setup_mock_mpr(
+            mock_summary_docs, mock_electrode_docs
+        )
 
-        mock_mpr = MagicMock()
-        mock_mpr.materials.summary.search.return_value = mock_summary_docs
-        mock_mpr.insertion_electrodes.search.return_value = mock_electrode_docs
-        mock_mpr.__enter__ = MagicMock(return_value=mock_mpr)
-        mock_mpr.__exit__ = MagicMock(return_value=False)
-
-        with patch("cathode_ml.data.mp_fetcher.MPRester", return_value=mock_mpr):
+        with patch("cathode_ml.data.mp_fetcher._get_mprester",
+                    return_value=mock_rester_class):
             with patch.dict("os.environ", {"MP_API_KEY": "test-key"}):
                 result = fetcher.fetch()
 
@@ -207,14 +213,12 @@ class TestMPFetcherAPIPath:
         from cathode_ml.data.mp_fetcher import MPFetcher
 
         fetcher = MPFetcher(mp_config, mp_cache)
+        mock_mpr, mock_rester_class = _setup_mock_mpr(
+            mock_summary_docs, mock_electrode_docs
+        )
 
-        mock_mpr = MagicMock()
-        mock_mpr.materials.summary.search.return_value = mock_summary_docs
-        mock_mpr.insertion_electrodes.search.return_value = mock_electrode_docs
-        mock_mpr.__enter__ = MagicMock(return_value=mock_mpr)
-        mock_mpr.__exit__ = MagicMock(return_value=False)
-
-        with patch("cathode_ml.data.mp_fetcher.MPRester", return_value=mock_mpr):
+        with patch("cathode_ml.data.mp_fetcher._get_mprester",
+                    return_value=mock_rester_class):
             with patch.dict("os.environ", {"MP_API_KEY": "test-key"}):
                 fetcher.fetch()
 
@@ -244,13 +248,12 @@ class TestMPFetcherForceRefresh:
         })
         mp_cache.save(cache_key, {"records": []})
 
-        mock_mpr = MagicMock()
-        mock_mpr.materials.summary.search.return_value = mock_summary_docs
-        mock_mpr.insertion_electrodes.search.return_value = mock_electrode_docs
-        mock_mpr.__enter__ = MagicMock(return_value=mock_mpr)
-        mock_mpr.__exit__ = MagicMock(return_value=False)
+        mock_mpr, mock_rester_class = _setup_mock_mpr(
+            mock_summary_docs, mock_electrode_docs
+        )
 
-        with patch("cathode_ml.data.mp_fetcher.MPRester", return_value=mock_mpr):
+        with patch("cathode_ml.data.mp_fetcher._get_mprester",
+                    return_value=mock_rester_class):
             with patch.dict("os.environ", {"MP_API_KEY": "test-key"}):
                 result = fetcher.fetch(force_refresh=True)
 
@@ -269,14 +272,12 @@ class TestMPFetcherStructureConversion:
         from cathode_ml.data.mp_fetcher import MPFetcher
 
         fetcher = MPFetcher(mp_config, mp_cache)
+        mock_mpr, mock_rester_class = _setup_mock_mpr(
+            mock_summary_docs, mock_electrode_docs
+        )
 
-        mock_mpr = MagicMock()
-        mock_mpr.materials.summary.search.return_value = mock_summary_docs
-        mock_mpr.insertion_electrodes.search.return_value = mock_electrode_docs
-        mock_mpr.__enter__ = MagicMock(return_value=mock_mpr)
-        mock_mpr.__exit__ = MagicMock(return_value=False)
-
-        with patch("cathode_ml.data.mp_fetcher.MPRester", return_value=mock_mpr):
+        with patch("cathode_ml.data.mp_fetcher._get_mprester",
+                    return_value=mock_rester_class):
             with patch.dict("os.environ", {"MP_API_KEY": "test-key"}):
                 result = fetcher.fetch()
 
@@ -293,14 +294,12 @@ class TestMPFetcherSpaceGroup:
         from cathode_ml.data.mp_fetcher import MPFetcher
 
         fetcher = MPFetcher(mp_config, mp_cache)
+        mock_mpr, mock_rester_class = _setup_mock_mpr(
+            mock_summary_docs, mock_electrode_docs
+        )
 
-        mock_mpr = MagicMock()
-        mock_mpr.materials.summary.search.return_value = mock_summary_docs
-        mock_mpr.insertion_electrodes.search.return_value = mock_electrode_docs
-        mock_mpr.__enter__ = MagicMock(return_value=mock_mpr)
-        mock_mpr.__exit__ = MagicMock(return_value=False)
-
-        with patch("cathode_ml.data.mp_fetcher.MPRester", return_value=mock_mpr):
+        with patch("cathode_ml.data.mp_fetcher._get_mprester",
+                    return_value=mock_rester_class):
             with patch.dict("os.environ", {"MP_API_KEY": "test-key"}):
                 result = fetcher.fetch()
 
