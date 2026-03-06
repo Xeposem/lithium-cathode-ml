@@ -44,9 +44,9 @@ Plans:
 **Plans:** 3/3 plans complete
 
 Plans:
-- [ ] 02-01-PLAN.md — Crystal structure to PyG graph conversion with Gaussian edge features
-- [ ] 02-02-PLAN.md — Magpie composition featurizer and compositional group splitting
-- [ ] 02-03-PLAN.md — Random Forest and XGBoost baseline models with JSON results
+- [x] 02-01-PLAN.md — Crystal structure to PyG graph conversion with Gaussian edge features
+- [x] 02-02-PLAN.md — Magpie composition featurizer and compositional group splitting
+- [x] 02-03-PLAN.md — Random Forest and XGBoost baseline models with JSON results
 
 ### Phase 3: CGCNN Implementation
 **Goal:** CGCNN predicts cathode properties with proper training infrastructure that MEGNet will reuse
@@ -57,7 +57,11 @@ Plans:
   2. Training uses CGCNN-appropriate hyperparameters (LR ~1e-3, ~400 epochs, early stopping) configured via YAML, not hardcoded
   3. Model checkpoints, training loss curves, and per-epoch validation metrics are saved as artifacts (pt files, JSON, CSV) after each training run
   4. Cross-validated evaluation on the same compositional folds as baselines produces comparable metrics (MAE, RMSE, R-squared)
-**Plans:** TBD
+**Plans:** 2 plans
+
+Plans:
+- [ ] 03-01-PLAN.md — CGCNN model class, shared evaluation utils, and YAML config
+- [ ] 03-02-PLAN.md — GNNTrainer and CGCNN training orchestrator with artifacts
 
 ### Phase 4: MEGNet Implementation
 **Goal:** MEGNet produces results on identical data splits as CGCNN for a fair head-to-head comparison
@@ -102,7 +106,7 @@ Plans:
 |-------|---------------|--------|-----------|
 | 1. Data Pipeline and Project Foundation | 3/3 | Complete   | 2026-03-06 |
 | 2. Featurization and Baseline Models | 3/3 | Complete   | 2026-03-06 |
-| 3. CGCNN Implementation | 0/0 | Not started | - |
+| 3. CGCNN Implementation | 0/2 | In progress | - |
 | 4. MEGNet Implementation | 0/0 | Not started | - |
 | 5. Evaluation and Benchmarking | 0/0 | Not started | - |
 | 6. Dashboard and Documentation | 0/0 | Not started | - |
