@@ -131,12 +131,17 @@ class TestArtifactFormat:
         from cathode_ml.models.train_megnet import train_megnet
         from cathode_ml.data.schemas import MaterialRecord
 
-        # Create minimal records with valid formation_energy_per_atom
+        # Create minimal records with diverse formulas for compositional splitting
+        formulas = [
+            "LiCoO2", "LiMnO2", "LiNiO2", "LiFePO4", "LiMn2O4",
+            "LiNi0.5Mn0.5O2", "LiNi0.33Co0.33Mn0.33O2", "LiTiO2",
+            "LiVO2", "LiCrO2",
+        ]
         records = []
         for i in range(10):
             records.append(MaterialRecord(
                 material_id=f"test-{i}",
-                formula="LiCoO2",
+                formula=formulas[i],
                 structure_dict={},  # empty structure
                 source="test",
                 formation_energy_per_atom=float(i) * 0.1,
@@ -244,7 +249,7 @@ class TestCheckpointSavedAsPt:
                  }), \
                  patch("cathode_ml.models.train_megnet._run_lightning_training") as mock_train:
                 # Mock _run_lightning_training to create fake checkpoint files
-                def fake_training(model, train_structs, train_targets, val_structs, val_targets,
+                def fake_training(model, train_structures, train_targets, val_structures, val_targets,
                                   property_name, megnet_config, seed):
                     # Simulate what Lightning would create
                     import torch
@@ -285,12 +290,17 @@ class TestTrainMegnetPerPropertyLoop:
         from cathode_ml.models.train_megnet import train_megnet
         from cathode_ml.data.schemas import MaterialRecord
 
-        # Create records where only formation_energy_per_atom has >=5
+        # Create records with diverse formulas for compositional splitting
+        formulas = [
+            "LiCoO2", "LiMnO2", "LiNiO2", "LiFePO4", "LiMn2O4",
+            "LiNi0.5Mn0.5O2", "LiNi0.33Co0.33Mn0.33O2", "LiTiO2",
+            "LiVO2", "LiCrO2",
+        ]
         records = []
         for i in range(10):
             records.append(MaterialRecord(
                 material_id=f"test-{i}",
-                formula="LiCoO2",
+                formula=formulas[i],
                 structure_dict={},
                 source="test",
                 formation_energy_per_atom=float(i) * 0.1,
