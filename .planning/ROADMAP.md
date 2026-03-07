@@ -107,7 +107,13 @@ Plans:
   6. Training curves (loss, learning rate, convergence) display per model in the dashboard
   7. README contains introduction, methodology, pipeline details, and results summary with key findings
 
-**Plans:** TBD
+**Plans:** 4 plans
+
+Plans:
+- [ ] 06-01-PLAN.md — Dashboard scaffolding, utilities, Overview and Model Comparison pages
+- [ ] 06-02-PLAN.md — Baseline model persistence, Predict page, and Crystal Viewer
+- [ ] 06-03-PLAN.md — Data Explorer and Materials Explorer pages
+- [ ] 06-04-PLAN.md — Comprehensive README documentation
 
 ## Progress
 
@@ -118,7 +124,7 @@ Plans:
 | 3. CGCNN Implementation | 1/2 | In progress | - |
 | 4. MEGNet Implementation | 0/2 | Not started | - |
 | 5. Evaluation and Benchmarking | 3/3 | Complete   | 2026-03-07 |
-| 6. Dashboard and Documentation | 0/0 | Not started | - |
+| 6. Dashboard and Documentation | 0/4 | Not started | - |
 
 ---
-*Last updated: 2026-03-06*
+*Last updated: 2026-03-07*
