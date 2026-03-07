@@ -138,7 +138,11 @@ def load_gnn_model(
 
             pretrained_name = megnet_config["model"]["pretrained_model"]
             model = matgl.load_model(pretrained_name)
-            model.model.load_state_dict(checkpoint["model_state_dict"])
+            if isinstance(checkpoint, dict) and "model_state_dict" in checkpoint:
+                state_dict = checkpoint["model_state_dict"]
+            else:
+                state_dict = checkpoint  # Raw state_dict (MEGNet format)
+            model.model.load_state_dict(state_dict)
             model.model.eval()
             logger.info("Loaded MEGNet model for %s", property_name)
             return model
@@ -244,19 +248,13 @@ def predict_from_structure(
 
             try:
                 if gnn_name == "cgcnn":
-                    from cathode_ml.features.graph import structure_to_pyg_data
+                    from cathode_ml.features.graph import structure_to_graph
 
                     import yaml
                     with open(Path(configs_dir) / "features.yaml") as f:
                         feat_cfg = yaml.safe_load(f)
 
-                    graph_cfg = feat_cfg["graph"]
-                    data = structure_to_pyg_data(
-                        structure,
-                        cutoff=graph_cfg["cutoff_radius"],
-                        max_neighbors=graph_cfg["max_neighbors"],
-                        gaussian_config=graph_cfg["gaussian"],
-                    )
+                    data = structure_to_graph(structure, feat_cfg)
                     # Add batch dimension
                     data.batch = torch.zeros(data.x.size(0), dtype=torch.long)
                     with torch.no_grad():

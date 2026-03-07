@@ -193,5 +193,4 @@ def main() -> None:
                 _render_prediction_cards(all_results)
 
 
-if __name__ == "__main__":
-    main()
+main()

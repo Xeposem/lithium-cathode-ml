@@ -53,34 +53,32 @@ def get_all_results(results_base: str = "data/results") -> dict:
 
 
 @st.cache_data
-def get_cached_records(cache_dir: str = "data/cache") -> list[dict]:
-    """Load cleaned material records from the data cache.
+def get_cached_records(data_dir: str = "data/processed") -> list[dict]:
+    """Load processed material records from JSON.
 
-    Reads the ``cleaned_records`` cache entry and returns a list
-    of dicts. Handles both list and dict-of-dataclass formats.
+    Reads ``materials.json`` from the processed data directory.
+    Handles both plain JSON list format and legacy DataCache wrapper.
 
     Args:
-        cache_dir: Path to the cache directory.
+        data_dir: Path to the processed data directory.
 
     Returns:
         List of material record dicts. Empty list if not found.
     """
-    cache_path = Path(cache_dir) / "cleaned_records.json"
-    if not cache_path.exists():
-        logger.warning("Cleaned records cache not found: %s", cache_path)
+    data_path = Path(data_dir) / "materials.json"
+    if not data_path.exists():
+        logger.warning("Processed data not found: %s", data_path)
         return []
 
     try:
-        with open(cache_path) as f:
-            payload = json.load(f)
-        # DataCache format: {"timestamp": ..., "metadata": ..., "data": ...}
-        data = payload.get("data", payload)
+        with open(data_path) as f:
+            data = json.load(f)
         if isinstance(data, list):
             return data
-        # If data is a dict, wrap in list
-        return [data]
-    except (json.JSONDecodeError, OSError, KeyError) as exc:
-        logger.warning("Failed to load cached records: %s", exc)
+        # Handle legacy DataCache wrapper format
+        return data.get("data", [data])
+    except (json.JSONDecodeError, OSError) as exc:
+        logger.warning("Failed to load processed data: %s", exc)
         return []
 
 
