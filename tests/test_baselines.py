@@ -6,6 +6,7 @@ JSON result saving, and the full run_baselines orchestrator.
 
 import json
 import math
+from pathlib import Path
 from unittest.mock import patch
 
 import numpy as np
@@ -189,6 +190,38 @@ def test_run_baselines_per_property(fake_records, baselines_config, features_cfg
     # Should have results for each target property
     for prop in features_cfg["target_properties"]:
         assert prop in results, f"Missing property {prop} in results"
+
+
+def test_results_saved_to_baselines_subdir(fake_records, baselines_config, features_cfg):
+    """run_baselines saves results JSON to {results_dir}/baselines/baseline_results.json, not {results_dir}/baseline_results.json."""
+    n = len(fake_records)
+    fake_X = np.random.RandomState(42).randn(n, 10)
+    fake_labels = [f"feat_{i}" for i in range(10)]
+
+    with patch(
+        "cathode_ml.models.baselines.featurize_compositions",
+        return_value=(fake_X, fake_labels),
+    ):
+        run_baselines(fake_records, features_cfg, baselines_config, seed=42)
+
+    results_dir = Path(baselines_config["results_dir"])
+
+    # Correct path: under baselines/ subdirectory
+    correct_path = results_dir / "baselines" / "baseline_results.json"
+    assert correct_path.exists(), (
+        f"Expected results at {correct_path}, but file does not exist"
+    )
+
+    # Verify it's valid JSON
+    with open(correct_path) as f:
+        data = json.load(f)
+    assert isinstance(data, dict)
+
+    # Old wrong path should NOT exist
+    wrong_path = results_dir / "baseline_results.json"
+    assert not wrong_path.exists(), (
+        f"Results should NOT be at {wrong_path} (old incorrect path)"
+    )
 
 
 def test_results_contain_both_models(fake_records, baselines_config, features_cfg):

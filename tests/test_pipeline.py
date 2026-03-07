@@ -146,6 +146,110 @@ class TestRunPipeline:
 # Module entry point test
 # ---------------------------------------------------------------------------
 
+class TestRunTrainStage:
+    """Tests verifying run_train_stage config and data loading wiring."""
+
+    def _make_args(self, **overrides):
+        """Create a namespace with default pipeline args, applying overrides."""
+        parser = build_parser()
+        args = parser.parse_args([])
+        for key, val in overrides.items():
+            setattr(args, key, val)
+        return args
+
+    @patch("cathode_ml.models.train_megnet.train_megnet")
+    @patch("cathode_ml.models.train_cgcnn.train_cgcnn")
+    @patch("cathode_ml.models.baselines.run_baselines")
+    @patch("cathode_ml.config.load_config")
+    def test_loads_separate_config_files(
+        self, mock_load_config, mock_baselines, mock_cgcnn, mock_megnet
+    ):
+        """run_train_stage calls load_config with features.yaml, baselines.yaml, cgcnn.yaml, megnet.yaml -- not data.yaml."""
+        # load_config returns a minimal dict for each call
+        mock_load_config.return_value = {
+            "target_properties": ["formation_energy_per_atom"],
+            "splitting": {"test_size": 0.1, "val_size": 0.1},
+        }
+
+        # Patch json.load and open for data reading
+        fake_records = [
+            {
+                "material_id": "test-1",
+                "formula": "LiCoO2",
+                "structure_dict": {},
+                "source": "test",
+            }
+        ]
+        with patch("builtins.open", MagicMock()), \
+             patch("json.load", return_value=fake_records):
+            args = self._make_args(
+                models=["rf", "xgb", "cgcnn", "megnet"], config_dir="configs"
+            )
+            from cathode_ml.pipeline import run_train_stage
+
+            run_train_stage(args)
+
+        # Collect all paths load_config was called with
+        called_paths = [str(call.args[0]) for call in mock_load_config.call_args_list]
+
+        # Should have been called with separate YAML files
+        assert any("features.yaml" in p for p in called_paths), (
+            f"Expected features.yaml in calls, got: {called_paths}"
+        )
+        assert any("baselines.yaml" in p for p in called_paths), (
+            f"Expected baselines.yaml in calls, got: {called_paths}"
+        )
+        assert any("cgcnn.yaml" in p for p in called_paths), (
+            f"Expected cgcnn.yaml in calls, got: {called_paths}"
+        )
+        assert any("megnet.yaml" in p for p in called_paths), (
+            f"Expected megnet.yaml in calls, got: {called_paths}"
+        )
+        # Should NOT use data.yaml
+        assert not any("data.yaml" in p for p in called_paths), (
+            f"Should not call load_config with data.yaml, got: {called_paths}"
+        )
+
+    @patch("cathode_ml.models.train_megnet.train_megnet")
+    @patch("cathode_ml.models.train_cgcnn.train_cgcnn")
+    @patch("cathode_ml.models.baselines.run_baselines")
+    @patch("cathode_ml.config.load_config")
+    def test_loads_processed_records(
+        self, mock_load_config, mock_baselines, mock_cgcnn, mock_megnet
+    ):
+        """run_train_stage reads records from data/processed/materials.json (not DataCache)."""
+        mock_load_config.return_value = {
+            "target_properties": ["formation_energy_per_atom"],
+            "splitting": {"test_size": 0.1, "val_size": 0.1},
+        }
+
+        fake_records = [
+            {
+                "material_id": "test-1",
+                "formula": "LiCoO2",
+                "structure_dict": {},
+                "source": "test",
+            }
+        ]
+
+        mock_file = MagicMock()
+        with patch("builtins.open", mock_file), \
+             patch("json.load", return_value=fake_records):
+            args = self._make_args(
+                models=["rf", "xgb", "cgcnn", "megnet"], config_dir="configs"
+            )
+            from cathode_ml.pipeline import run_train_stage
+
+            run_train_stage(args)
+
+        # Verify open was called with a path containing materials.json
+        open_calls = mock_file.call_args_list
+        open_paths = [str(call.args[0]) if call.args else "" for call in open_calls]
+        assert any("materials.json" in p for p in open_paths), (
+            f"Expected open() called with materials.json path, got: {open_paths}"
+        )
+
+
 class TestModuleEntryPoint:
     """Test that cathode_ml/__main__.py can be imported."""
 
