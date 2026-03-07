@@ -30,7 +30,7 @@ def _cache_resource(func):
     try:
         import streamlit as st
         return st.cache_resource(func)
-    except ImportError:
+    except (ImportError, TypeError, AttributeError):
         return func
 
 

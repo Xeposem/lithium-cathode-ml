@@ -30,6 +30,7 @@ def _identity_decorator(func=None, **kwargs):
 
 
 _st_mock.cache_data = _identity_decorator
+_st_mock.cache_resource = _identity_decorator
 sys.modules.setdefault("streamlit", _st_mock)
 
 
