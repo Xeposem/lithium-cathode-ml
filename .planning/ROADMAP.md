@@ -141,7 +141,10 @@ Plans:
   2. `model_loader.py` imports `structure_to_graph` (not `structure_to_pyg_data`) and passes config dict correctly
   3. MEGNet checkpoint loading handles raw state_dict format (no `model_state_dict` key required)
   4. `get_cached_records()` reads from `data/processed/materials.json` so Data Explorer and Materials Explorer display actual data
-**Plans:** 0 plans
+**Plans:** 1 plan
+
+Plans:
+- [ ] 08-01-PLAN.md — Fix page guards, graph import, checkpoint format, and data path
 
 ## Progress
 
@@ -154,7 +157,7 @@ Plans:
 | 5. Evaluation and Benchmarking | 3/3 | Complete   | 2026-03-07 |
 | 6. Dashboard and Documentation | 4/4 | Complete   | 2026-03-07 |
 | 7. Fix Pipeline Orchestrator Wiring | 1/1 | Complete   | 2026-03-07 |
-| 8. Fix Dashboard Cross-Phase Wiring | 0/0 | Not started | - |
+| 8. Fix Dashboard Cross-Phase Wiring | 0/1 | Not started | - |
 
 ---
 *Last updated: 2026-03-07*
