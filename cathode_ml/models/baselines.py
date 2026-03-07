@@ -193,7 +193,7 @@ def run_baselines(
         results[prop] = prop_results
 
     # Save combined results
-    results_path = str(Path(results_dir) / "baseline_results.json")
+    results_path = str(Path(results_dir) / "baselines" / "baseline_results.json")
     save_results(results, results_path)
 
     return results

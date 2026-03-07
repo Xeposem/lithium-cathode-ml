@@ -90,31 +90,36 @@ def run_featurize_stage(args: argparse.Namespace) -> None:
 
 
 def run_train_stage(args: argparse.Namespace) -> None:
-    """Train selected models on cached data."""
+    """Train selected models on processed data with separate config files."""
+    import json as _json  # noqa: C0415
+
     from cathode_ml.config import load_config  # noqa: C0415
-    from cathode_ml.data.cache import DataCache  # noqa: C0415
+    from cathode_ml.data.schemas import MaterialRecord  # noqa: C0415
 
-    config = load_config(str(Path(args.config_dir) / "data.yaml"))
+    config_dir = Path(args.config_dir)
 
-    # Load cached records
-    cache = DataCache(cache_dir="data/cache")
-    records = cache.load("cleaned_records")
+    # Load separate config files (not monolithic data.yaml)
+    features_config = load_config(str(config_dir / "features.yaml"))
 
-    features_config = config.get("features", {})
+    # Load processed records from JSON (not DataCache)
+    processed_path = Path("data/processed/materials.json")
+    with open(processed_path) as f:
+        raw_records = _json.load(f)
+    records = [MaterialRecord(**r) for r in raw_records]
 
     # Baseline models (RF, XGBoost)
     baseline_models = [m for m in args.models if m in ("rf", "xgb")]
     if baseline_models:
         from cathode_ml.models.baselines import run_baselines  # noqa: C0415
 
-        baselines_config = config.get("baselines", {})
+        baselines_config = load_config(str(config_dir / "baselines.yaml"))
         run_baselines(records, features_config, baselines_config, seed=args.seed)
 
     # CGCNN
     if "cgcnn" in args.models:
         from cathode_ml.models.train_cgcnn import train_cgcnn  # noqa: C0415
 
-        cgcnn_config = config.get("cgcnn", {})
+        cgcnn_config = load_config(str(config_dir / "cgcnn.yaml"))
         train_cgcnn(
             records=records,
             features_config=features_config,
@@ -126,7 +131,7 @@ def run_train_stage(args: argparse.Namespace) -> None:
     if "megnet" in args.models:
         from cathode_ml.models.train_megnet import train_megnet  # noqa: C0415
 
-        megnet_config = config.get("megnet", {})
+        megnet_config = load_config(str(config_dir / "megnet.yaml"))
         train_megnet(
             records=records,
             features_config=features_config,
