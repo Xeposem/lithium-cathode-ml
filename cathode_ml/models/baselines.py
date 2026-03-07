@@ -129,6 +129,11 @@ def run_baselines(
 
     results: dict = {}
 
+    # Ensure baselines directory exists for joblib model persistence
+    results_dir = baselines_config.get("results_dir", "data/results")
+    baselines_dir = Path(results_dir) / "baselines"
+    baselines_dir.mkdir(parents=True, exist_ok=True)
+
     for prop in target_properties:
         logger.info("Training baselines for: %s", prop)
 
@@ -167,6 +172,11 @@ def run_baselines(
         logger.info("  RF  MAE=%.4f  RMSE=%.4f  R2=%.4f",
                      prop_results["rf"]["mae"], prop_results["rf"]["rmse"], prop_results["rf"]["r2"])
 
+        # Persist RF model as joblib
+        import joblib
+        joblib.dump(rf_model, baselines_dir / f"rf_{prop}.joblib")
+        logger.info("  RF model saved to %s", baselines_dir / f"rf_{prop}.joblib")
+
         # Train and evaluate XGBoost
         xgb_model = train_baseline(
             X_train, y_train, model_type="xgb",
@@ -176,10 +186,13 @@ def run_baselines(
         logger.info("  XGB MAE=%.4f  RMSE=%.4f  R2=%.4f",
                      prop_results["xgb"]["mae"], prop_results["xgb"]["rmse"], prop_results["xgb"]["r2"])
 
+        # Persist XGBoost model as joblib
+        joblib.dump(xgb_model, baselines_dir / f"xgb_{prop}.joblib")
+        logger.info("  XGB model saved to %s", baselines_dir / f"xgb_{prop}.joblib")
+
         results[prop] = prop_results
 
     # Save combined results
-    results_dir = baselines_config.get("results_dir", "data/results")
     results_path = str(Path(results_dir) / "baseline_results.json")
     save_results(results, results_path)
 
