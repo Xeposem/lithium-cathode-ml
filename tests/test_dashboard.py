@@ -107,10 +107,26 @@ class TestGetAllResults:
 
 class TestGetCachedRecords:
     def test_get_cached_records(self, tmp_path):
-        """get_cached_records returns list of dicts."""
-        cache_dir = tmp_path / "cache"
-        cache_dir.mkdir()
-        # Create a fake cache file matching DataCache format
+        """get_cached_records reads from data/processed/materials.json (plain list)."""
+        data_dir = tmp_path / "processed"
+        data_dir.mkdir()
+        # Plain JSON list format (what the pipeline actually produces)
+        records_data = [
+            {"material_id": "mp-1", "formula": "LiCoO2"},
+            {"material_id": "mp-2", "formula": "LiFePO4"},
+        ]
+        (data_dir / "materials.json").write_text(json.dumps(records_data))
+
+        records = get_cached_records(str(data_dir))
+        assert isinstance(records, list)
+        assert len(records) == 2
+        assert records[0]["material_id"] == "mp-1"
+
+    def test_get_cached_records_legacy_format(self, tmp_path):
+        """get_cached_records handles legacy DataCache wrapper format."""
+        data_dir = tmp_path / "processed"
+        data_dir.mkdir()
+        # Legacy DataCache wrapper format
         payload = {
             "timestamp": "2026-01-01T00:00:00",
             "metadata": {},
@@ -119,9 +135,9 @@ class TestGetCachedRecords:
                 {"material_id": "mp-2", "formula": "LiFePO4"},
             ],
         }
-        (cache_dir / "cleaned_records.json").write_text(json.dumps(payload))
+        (data_dir / "materials.json").write_text(json.dumps(payload))
 
-        records = get_cached_records(str(cache_dir))
+        records = get_cached_records(str(data_dir))
         assert isinstance(records, list)
         assert len(records) == 2
         assert records[0]["material_id"] == "mp-1"
@@ -240,22 +256,18 @@ def sample_materials_df():
 
 
 def test_data_explorer_load(tmp_path):
-    """get_cached_records returns non-empty list when cache exists."""
+    """get_cached_records returns non-empty list from materials.json."""
     import json
 
-    cache_dir = tmp_path / "cache"
-    cache_dir.mkdir()
-    payload = {
-        "timestamp": "2026-01-01T00:00:00",
-        "metadata": {},
-        "data": [
-            {"material_id": "mp-1", "formula": "LiCoO2", "voltage": 3.9},
-            {"material_id": "mp-2", "formula": "LiFePO4", "voltage": 3.4},
-        ],
-    }
-    (cache_dir / "cleaned_records.json").write_text(json.dumps(payload))
+    data_dir = tmp_path / "processed"
+    data_dir.mkdir()
+    records_data = [
+        {"material_id": "mp-1", "formula": "LiCoO2", "voltage": 3.9},
+        {"material_id": "mp-2", "formula": "LiFePO4", "voltage": 3.4},
+    ]
+    (data_dir / "materials.json").write_text(json.dumps(records_data))
 
-    records = get_cached_records(str(cache_dir))
+    records = get_cached_records(str(data_dir))
     assert isinstance(records, list)
     assert len(records) == 2
 

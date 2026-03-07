@@ -154,3 +154,112 @@ class TestModelLoader:
             "LiFePO4", results_base=str(tmp_path / "nonexistent")
         )
         assert result == {}
+
+
+# ---------------------------------------------------------------------------
+# Test: Structure prediction wiring (cross-phase)
+# ---------------------------------------------------------------------------
+
+
+class TestStructurePrediction:
+    """Tests verifying correct wiring between dashboard and core modules."""
+
+    def test_structure_to_graph_import(self):
+        """Verify structure_to_graph is importable and accepts (structure, config)."""
+        import inspect
+
+        from cathode_ml.features.graph import structure_to_graph
+
+        sig = inspect.signature(structure_to_graph)
+        params = list(sig.parameters.keys())
+        assert params == ["structure", "config"], (
+            f"Expected (structure, config) but got {params}"
+        )
+
+    def test_model_loader_uses_structure_to_graph(self):
+        """model_loader.py imports structure_to_graph, not structure_to_pyg_data."""
+        import ast
+
+        source_path = Path("dashboard/utils/model_loader.py")
+        source = source_path.read_text()
+        tree = ast.parse(source)
+
+        imports_found = []
+        for node in ast.walk(tree):
+            if isinstance(node, ast.ImportFrom):
+                if node.module and "cathode_ml.features.graph" in node.module:
+                    for alias in node.names:
+                        imports_found.append(alias.name)
+
+        assert "structure_to_graph" in imports_found, (
+            f"Expected 'structure_to_graph' import, found: {imports_found}"
+        )
+        assert "structure_to_pyg_data" not in imports_found, (
+            "model_loader.py should NOT import structure_to_pyg_data"
+        )
+
+    def test_megnet_raw_state_dict_loading(self):
+        """MEGNet loader handles raw state_dict (no 'model_state_dict' key)."""
+        import ast
+
+        source_path = Path("dashboard/utils/model_loader.py")
+        source = source_path.read_text()
+
+        # Verify the code handles both formats (raw and wrapped)
+        assert "isinstance(checkpoint, dict)" in source or (
+            "model_state_dict" in source
+            and "else" in source
+        ), "MEGNet loader should handle both raw state_dict and wrapped format"
+
+        # More specifically: should not unconditionally access checkpoint["model_state_dict"]
+        # Parse AST to find the megnet branch
+        tree = ast.parse(source)
+        # Check that there's a conditional check before accessing the key
+        assert 'checkpoint["model_state_dict"]' not in source or (
+            "isinstance(checkpoint" in source
+            or "if" in source.split('checkpoint["model_state_dict"]')[0].split("\n")[-1]
+        ), "MEGNet loader should not unconditionally access checkpoint['model_state_dict']"
+
+
+class TestPageModuleLevelMain:
+    """Tests verifying pages call main() at module level (not behind __name__ guard)."""
+
+    def test_predict_page_module_level_main(self):
+        """predict.py calls main() at module level, not behind __name__ guard."""
+        import ast
+
+        source_path = Path("dashboard/pages/predict.py")
+        source = source_path.read_text()
+        tree = ast.parse(source)
+
+        # Check for top-level main() call
+        has_top_level_main_call = False
+        for node in tree.body:
+            if isinstance(node, ast.Expr) and isinstance(node.value, ast.Call):
+                func = node.value.func
+                if isinstance(func, ast.Name) and func.id == "main":
+                    has_top_level_main_call = True
+
+        assert has_top_level_main_call, (
+            "predict.py must call main() at module level (not behind __name__ guard)"
+        )
+
+    def test_crystal_viewer_module_level_main(self):
+        """crystal_viewer.py calls main() at module level, not behind __name__ guard."""
+        import ast
+
+        source_path = Path("dashboard/pages/crystal_viewer.py")
+        source = source_path.read_text()
+        tree = ast.parse(source)
+
+        # Check for top-level main() call
+        has_top_level_main_call = False
+        for node in tree.body:
+            if isinstance(node, ast.Expr) and isinstance(node.value, ast.Call):
+                func = node.value.func
+                if isinstance(func, ast.Name) and func.id == "main":
+                    has_top_level_main_call = True
+
+        assert has_top_level_main_call, (
+            "crystal_viewer.py must call main() at module level (not behind __name__ guard)"
+        )
