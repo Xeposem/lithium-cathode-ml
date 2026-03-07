@@ -35,8 +35,8 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Evaluation
 
-- [ ] **EVAL-01**: System evaluates all models with MAE, RMSE, and R-squared metrics
-- [ ] **EVAL-02**: System uses consistent cross-validation folds across all models for fair comparison
+- [x] **EVAL-01**: System evaluates all models with MAE, RMSE, and R-squared metrics
+- [x] **EVAL-02**: System uses consistent cross-validation folds across all models for fair comparison
 - [ ] **EVAL-03**: System generates parity plots (predicted vs actual) for each model and property
 - [ ] **EVAL-04**: System generates bar chart comparisons of model performance across properties
 - [ ] **EVAL-05**: System generates learning/training curves (loss, validation MAE per epoch)
@@ -115,8 +115,8 @@ Deferred to future release. Tracked but not in current roadmap.
 | MODL-05 | Phase 3 | Complete |
 | MODL-06 | Phase 3 | Complete |
 | MODL-07 | Phase 3 | Complete |
-| EVAL-01 | Phase 5 | Pending |
-| EVAL-02 | Phase 5 | Pending |
+| EVAL-01 | Phase 5 | Complete |
+| EVAL-02 | Phase 5 | Complete |
 | EVAL-03 | Phase 5 | Pending |
 | EVAL-04 | Phase 5 | Pending |
 | EVAL-05 | Phase 5 | Pending |
