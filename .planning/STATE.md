@@ -4,12 +4,12 @@ milestone: v1.0
 milestone_name: milestone
 current_plan: Complete
 status: completed
-last_updated: "2026-03-07T09:37:58.185Z"
+last_updated: "2026-03-07T10:16:30Z"
 progress:
-  total_phases: 6
-  completed_phases: 6
-  total_plans: 17
-  completed_plans: 17
+  total_phases: 8
+  completed_phases: 7
+  total_plans: 18
+  completed_plans: 18
 ---
 
 # Project State
@@ -19,7 +19,7 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-05)
 
 **Core value:** Accurate, reproducible prediction of cathode performance properties from crystal structure, with clear model comparison and publication-quality results
-**Current focus:** Phase 6
+**Current focus:** Phase 7
 
 ## Progress
 
@@ -31,12 +31,13 @@ See: .planning/PROJECT.md (updated 2026-03-05)
 | 4 | MEGNet Implementation | Complete (2/2 plans) | MODL-02 |
 | 5 | Evaluation and Benchmarking | Complete (3/3 plans) | EVAL-01, EVAL-02, EVAL-03, EVAL-04, EVAL-05, REPR-04 |
 | 6 | Dashboard and Documentation | Complete (4/4 plans) | DASH-01, DASH-02, DASH-03, DASH-04, DASH-05, DASH-06, DASH-07, DOCS-01, DOCS-02, DOCS-03, DOCS-04 |
+| 7 | Fix Pipeline Orchestrator Wiring | Complete (1/1 plans) | EVAL-01, EVAL-02, EVAL-03, DATA-04 |
 
 ## Current Phase
 
-**Phase 6: Dashboard and Documentation**
+**Phase 7: Fix Pipeline Orchestrator Wiring**
 Status: Complete
-Plans: 4/4
+Plans: 1/1
 Current Plan: Complete
 
 ## Accumulated Context
@@ -89,6 +90,8 @@ Current Plan: Complete
 - NaN values pass through range filters to avoid dropping records with missing data
 - _extract_elements uses regex [A-Z][a-z]? for robust element extraction from formulas
 - Placeholder results table in README with note to update after training (actual values depend on data availability)
+- Import json as _json inside run_train_stage to avoid shadowing module-level names
+- Patch cathode_ml.config.load_config (definition site) since pipeline uses lazy imports
 
 ### Research Flags
 - Phase 4 (MEGNet): matgl v1.3.0 + PyTorch compatibility untested; may need separate conda env
@@ -104,4 +107,4 @@ None
 
 ---
 *Last updated: 2026-03-07*
-*Last session: Completed 06-04-PLAN.md (README and Documentation) -- ALL PHASES COMPLETE*
+*Last session: Completed 07-01-PLAN.md (Fix Pipeline Orchestrator Wiring)*

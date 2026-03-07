@@ -12,7 +12,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **DATA-01**: System ingests cathode material data from Materials Project via mp-api programmatically
 - [x] **DATA-02**: System ingests supplementary data from OQMD via REST API
 - [x] **DATA-03**: System ingests data from Battery Data Genome datasets
-- [ ] **DATA-04**: System caches downloaded data locally to avoid repeated API calls
+- [x] **DATA-04**: System caches downloaded data locally to avoid repeated API calls
 - [x] **DATA-05**: System preprocesses data: filters invalid structures, removes outliers, handles missing values
 - [x] **DATA-06**: System documents every preprocessing filter applied with rationale
 
@@ -35,9 +35,9 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Evaluation
 
-- [ ] **EVAL-01**: System evaluates all models with MAE, RMSE, and R-squared metrics
-- [ ] **EVAL-02**: System uses consistent cross-validation folds across all models for fair comparison
-- [ ] **EVAL-03**: System generates parity plots (predicted vs actual) for each model and property
+- [x] **EVAL-01**: System evaluates all models with MAE, RMSE, and R-squared metrics
+- [x] **EVAL-02**: System uses consistent cross-validation folds across all models for fair comparison
+- [x] **EVAL-03**: System generates parity plots (predicted vs actual) for each model and property
 - [x] **EVAL-04**: System generates bar chart comparisons of model performance across properties
 - [x] **EVAL-05**: System generates learning/training curves (loss, validation MAE per epoch)
 
@@ -101,7 +101,7 @@ Deferred to future release. Tracked but not in current roadmap.
 | DATA-01 | Phase 1 | Complete |
 | DATA-02 | Phase 1 | Complete |
 | DATA-03 | Phase 1 | Complete |
-| DATA-04 | Phase 7 | Pending |
+| DATA-04 | Phase 7 | Complete |
 | DATA-05 | Phase 1 | Complete |
 | DATA-06 | Phase 1 | Complete |
 | FEAT-01 | Phase 2 | Complete |
@@ -115,9 +115,9 @@ Deferred to future release. Tracked but not in current roadmap.
 | MODL-05 | Phase 3 | Complete |
 | MODL-06 | Phase 3 | Complete |
 | MODL-07 | Phase 3 | Complete |
-| EVAL-01 | Phase 7 | Pending |
-| EVAL-02 | Phase 7 | Pending |
-| EVAL-03 | Phase 7 | Pending |
+| EVAL-01 | Phase 7 | Complete |
+| EVAL-02 | Phase 7 | Complete |
+| EVAL-03 | Phase 7 | Complete |
 | EVAL-04 | Phase 5 | Complete |
 | EVAL-05 | Phase 5 | Complete |
 | DASH-01 | Phase 8 | Pending |

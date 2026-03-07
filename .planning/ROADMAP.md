@@ -12,7 +12,7 @@
 - [ ] **Phase 4: MEGNet Implementation** - Second GNN architecture via matgl, isolated to contain DGL dependency risk
 - [x] **Phase 5: Evaluation and Benchmarking** - Rigorous cross-model comparison with publication-quality figures and CLI pipeline (completed 2026-03-07)
 - [x] **Phase 6: Dashboard and Documentation** - Interactive Streamlit dashboard and comprehensive README (completed 2026-03-07)
-- [ ] **Phase 7: Fix Pipeline Orchestrator Wiring** - Fix config loading, data handoff, and baseline results path in pipeline.py
+- [x] **Phase 7: Fix Pipeline Orchestrator Wiring** - Fix config loading, data handoff, and baseline results path in pipeline.py (completed 2026-03-07)
 - [ ] **Phase 8: Fix Dashboard Cross-Phase Wiring** - Fix page guards, import errors, checkpoint format, and data path in dashboard
 
 ## Phase Details
@@ -129,7 +129,7 @@ Plans:
 **Plans:** 1 plan
 
 Plans:
-- [ ] 07-01-PLAN.md — Fix config loading, data handoff, and baseline results path
+- [x] 07-01-PLAN.md — Fix config loading, data handoff, and baseline results path
 
 ### Phase 8: Fix Dashboard Cross-Phase Wiring
 **Goal:** All 6 dashboard pages render correctly with proper data loading, model prediction, and crystal viewing
@@ -153,7 +153,7 @@ Plans:
 | 4. MEGNet Implementation | 0/2 | Not started | - |
 | 5. Evaluation and Benchmarking | 3/3 | Complete   | 2026-03-07 |
 | 6. Dashboard and Documentation | 4/4 | Complete   | 2026-03-07 |
-| 7. Fix Pipeline Orchestrator Wiring | 0/1 | Not started | - |
+| 7. Fix Pipeline Orchestrator Wiring | 1/1 | Complete   | 2026-03-07 |
 | 8. Fix Dashboard Cross-Phase Wiring | 0/0 | Not started | - |
 
 ---
