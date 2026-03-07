@@ -1,7 +1,7 @@
 # Roadmap: Lithium-Ion Battery Cathode Performance Prediction
 
 **Created:** 2026-03-05
-**Phases:** 6
+**Phases:** 8
 **Requirements:** 37 mapped
 
 ## Phases
@@ -12,6 +12,8 @@
 - [ ] **Phase 4: MEGNet Implementation** - Second GNN architecture via matgl, isolated to contain DGL dependency risk
 - [x] **Phase 5: Evaluation and Benchmarking** - Rigorous cross-model comparison with publication-quality figures and CLI pipeline (completed 2026-03-07)
 - [x] **Phase 6: Dashboard and Documentation** - Interactive Streamlit dashboard and comprehensive README (completed 2026-03-07)
+- [ ] **Phase 7: Fix Pipeline Orchestrator Wiring** - Fix config loading, data handoff, and baseline results path in pipeline.py
+- [ ] **Phase 8: Fix Dashboard Cross-Phase Wiring** - Fix page guards, import errors, checkpoint format, and data path in dashboard
 
 ## Phase Details
 
@@ -115,6 +117,29 @@ Plans:
 - [ ] 06-03-PLAN.md — Data Explorer and Materials Explorer pages
 - [ ] 06-04-PLAN.md — Comprehensive README documentation
 
+### Phase 7: Fix Pipeline Orchestrator Wiring
+**Goal:** The unified pipeline CLI (`python -m cathode_ml`) correctly loads separate config files, reads processed data, and baseline results are found by the evaluation loader
+**Depends on:** Phase 5, Phase 6
+**Requirements:** EVAL-01, EVAL-02, EVAL-03, DATA-04
+**Gap Closure:** Closes audit findings 1, 2, 3
+**Success Criteria** (what must be TRUE):
+  1. `pipeline.py` loads `features.yaml`, `baselines.yaml`, `cgcnn.yaml`, `megnet.yaml` separately instead of extracting sections from `data.yaml`
+  2. Pipeline train stage reads records from `data/processed/materials.json` matching standalone CLIs
+  3. Baseline results JSON is saved to (or read from) a consistent path so `load_all_results` includes RF and XGBoost metrics
+**Plans:** 0 plans
+
+### Phase 8: Fix Dashboard Cross-Phase Wiring
+**Goal:** All 6 dashboard pages render correctly with proper data loading, model prediction, and crystal viewing
+**Depends on:** Phase 7
+**Requirements:** DASH-01, DASH-02, DASH-03, DASH-05, DASH-06, DASH-07
+**Gap Closure:** Closes audit findings 4, 5, 6, 7
+**Success Criteria** (what must be TRUE):
+  1. Predict and Crystal Viewer pages call `main()` at module level (not behind `__name__` guard) and render in Streamlit
+  2. `model_loader.py` imports `structure_to_graph` (not `structure_to_pyg_data`) and passes config dict correctly
+  3. MEGNet checkpoint loading handles raw state_dict format (no `model_state_dict` key required)
+  4. `get_cached_records()` reads from `data/processed/materials.json` so Data Explorer and Materials Explorer display actual data
+**Plans:** 0 plans
+
 ## Progress
 
 | Phase | Plans Complete | Status | Completed |
@@ -125,6 +150,8 @@ Plans:
 | 4. MEGNet Implementation | 0/2 | Not started | - |
 | 5. Evaluation and Benchmarking | 3/3 | Complete   | 2026-03-07 |
 | 6. Dashboard and Documentation | 4/4 | Complete   | 2026-03-07 |
+| 7. Fix Pipeline Orchestrator Wiring | 0/0 | Not started | - |
+| 8. Fix Dashboard Cross-Phase Wiring | 0/0 | Not started | - |
 
 ---
 *Last updated: 2026-03-07*
