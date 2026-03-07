@@ -137,9 +137,13 @@ def run_train_stage(args: argparse.Namespace) -> None:
 
 def run_evaluate_stage(args: argparse.Namespace) -> None:
     """Run evaluation: generate comparison tables and plots (if available)."""
-    from cathode_ml.evaluation.metrics import generate_all_tables  # noqa: C0415
+    from cathode_ml.evaluation.metrics import (  # noqa: C0415
+        generate_all_tables,
+        load_all_results,
+    )
 
-    generate_all_tables()
+    results_base = "data/results"
+    generate_all_tables(results_base)
 
     # Plots module may not exist yet (created in plan 05-02)
     try:
@@ -150,8 +154,10 @@ def run_evaluate_stage(args: argparse.Namespace) -> None:
         )
 
         apply_nature_style()
-        plot_bar_comparison()
-        plot_learning_curves()
+        all_results = load_all_results(results_base)
+        figures_dir = str(Path(results_base) / "figures")
+        plot_bar_comparison(all_results, str(Path(figures_dir) / "bar_comparison.png"))
+        plot_learning_curves(results_base, str(Path(figures_dir) / "learning_curves.png"))
     except ImportError:
         logger.info("Plots module not available; skipping plot generation.")
 
