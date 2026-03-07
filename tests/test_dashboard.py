@@ -211,3 +211,73 @@ class TestMakeParityPlot:
         # Check scatter trace exists
         scatter_traces = [t for t in fig.data if hasattr(t, "mode") and "markers" in str(t.mode)]
         assert len(scatter_traces) >= 1
+
+
+# ---------------------------------------------------------------------------
+# Data Explorer tests (Plan 03)
+# ---------------------------------------------------------------------------
+
+from dashboard.pages.data_explorer import (  # noqa: E402
+    _make_histogram,
+    _make_scatter_matrix,
+)
+
+
+@pytest.fixture
+def sample_materials_df():
+    """Sample materials DataFrame for explorer tests."""
+    return pd.DataFrame({
+        "material_id": ["mp-1", "mp-2", "mp-3", "mp-4", "mp-5"],
+        "formula": ["LiCoO2", "LiFePO4", "LiMnO2", "LiNiO2", "LiFeO2"],
+        "source": ["materials_project", "materials_project", "oqmd", "oqmd", "battery_data_genome"],
+        "formation_energy_per_atom": [-1.5, -1.2, -0.8, -1.0, -0.5],
+        "voltage": [3.9, 3.4, 4.0, 3.7, 3.2],
+        "capacity": [140.0, 170.0, 148.0, 200.0, 120.0],
+        "energy_above_hull": [0.0, 0.0, 0.05, 0.1, 0.2],
+        "is_stable": [True, True, False, False, False],
+        "space_group": [166, 62, 166, 166, 62],
+    })
+
+
+def test_data_explorer_load(tmp_path):
+    """get_cached_records returns non-empty list when cache exists."""
+    import json
+
+    cache_dir = tmp_path / "cache"
+    cache_dir.mkdir()
+    payload = {
+        "timestamp": "2026-01-01T00:00:00",
+        "metadata": {},
+        "data": [
+            {"material_id": "mp-1", "formula": "LiCoO2", "voltage": 3.9},
+            {"material_id": "mp-2", "formula": "LiFePO4", "voltage": 3.4},
+        ],
+    }
+    (cache_dir / "cleaned_records.json").write_text(json.dumps(payload))
+
+    records = get_cached_records(str(cache_dir))
+    assert isinstance(records, list)
+    assert len(records) == 2
+
+
+def test_histogram_creation(sample_materials_df):
+    """Histogram function returns Plotly Figure with expected axis labels."""
+    import plotly.graph_objects as go
+
+    fig = _make_histogram(sample_materials_df, "voltage", "#0072B2")
+    assert isinstance(fig, go.Figure)
+    assert len(fig.data) >= 1
+    # Check axis label contains property name
+    assert "voltage" in fig.layout.xaxis.title.text.lower() or "Voltage" in fig.layout.xaxis.title.text
+
+
+def test_scatter_matrix_creation(sample_materials_df):
+    """Scatter matrix function returns Plotly Figure."""
+    import plotly.graph_objects as go
+
+    fig = _make_scatter_matrix(
+        sample_materials_df,
+        ["formation_energy_per_atom", "voltage", "capacity"],
+    )
+    assert isinstance(fig, go.Figure)
+    assert len(fig.data) >= 1
