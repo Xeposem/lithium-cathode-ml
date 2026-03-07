@@ -1,9 +1,9 @@
 ---
-status: complete
+status: diagnosed
 phase: 08-fix-dashboard-cross-phase-wiring
 source: [08-01-SUMMARY.md]
 started: 2026-03-07T11:00:00Z
-updated: 2026-03-07T11:05:00Z
+updated: 2026-03-07T11:06:00Z
 ---
 
 ## Current Test
@@ -45,7 +45,10 @@ skipped: 0
   reason: "User reported: no cached data found. run the data pipeline first."
   severity: major
   test: 3
-  root_cause: ""
-  artifacts: []
-  missing: []
+  root_cause: "Not a code bug. data/processed/ directory does not exist because the data pipeline (Phase 1) has never been run in this environment. The dashboard code correctly points to data/processed/materials.json and gracefully returns empty list when file is missing. Fix: run the data pipeline to generate the file."
+  artifacts:
+    - path: "dashboard/utils/data_loader.py"
+      issue: "Correct path, but target file does not exist yet"
+  missing:
+    - "Run data pipeline: python -m cathode_ml.data.fetch && python -m cathode_ml.data.clean (or equivalent CLI)"
   debug_session: ""
