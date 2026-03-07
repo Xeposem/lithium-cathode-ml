@@ -147,13 +147,12 @@ class TestGenerateComparisonTable:
         table = generate_comparison_table(results, "formation_energy_per_atom")
 
         lines = [l for l in table.strip().splitlines() if l.strip()]
-        # Header line
-        assert "Model" in lines[0]
-        assert "MAE" in lines[0]
-        # Separator line
-        assert "---" in lines[1]
-        # At least one data row
-        assert len(lines) >= 3
+        # Find the table header line (may be preceded by a heading)
+        table_lines = [l for l in lines if l.startswith("|")]
+        assert len(table_lines) >= 3, "Expected header, separator, and data rows"
+        assert "Model" in table_lines[0]
+        assert "MAE" in table_lines[0]
+        assert "---" in table_lines[1]
 
     def test_generate_comparison_table_bold_best(self) -> None:
         """Best MAE/RMSE (lowest) and R2 (highest) are bolded."""
