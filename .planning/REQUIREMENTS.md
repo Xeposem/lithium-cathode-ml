@@ -60,10 +60,10 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Documentation
 
-- [ ] **DOCS-01**: README includes project introduction and motivation
-- [ ] **DOCS-02**: README includes methodology section covering model architectures and evaluation approach
-- [ ] **DOCS-03**: README includes pipeline implementation details (data flow, how to run)
-- [ ] **DOCS-04**: README includes results summary with key findings
+- [x] **DOCS-01**: README includes project introduction and motivation
+- [x] **DOCS-02**: README includes methodology section covering model architectures and evaluation approach
+- [x] **DOCS-03**: README includes pipeline implementation details (data flow, how to run)
+- [x] **DOCS-04**: README includes results summary with key findings
 
 ## v2 Requirements
 
@@ -131,10 +131,10 @@ Deferred to future release. Tracked but not in current roadmap.
 | REPR-02 | Phase 1 | Complete |
 | REPR-03 | Phase 1 | Complete |
 | REPR-04 | Phase 5 | Complete |
-| DOCS-01 | Phase 6 | Pending |
-| DOCS-02 | Phase 6 | Pending |
-| DOCS-03 | Phase 6 | Pending |
-| DOCS-04 | Phase 6 | Pending |
+| DOCS-01 | Phase 6 | Complete |
+| DOCS-02 | Phase 6 | Complete |
+| DOCS-03 | Phase 6 | Complete |
+| DOCS-04 | Phase 6 | Complete |
 
 **Coverage:**
 - v1 requirements: 37 total
