@@ -281,3 +281,57 @@ def test_scatter_matrix_creation(sample_materials_df):
     )
     assert isinstance(fig, go.Figure)
     assert len(fig.data) >= 1
+
+
+# ---------------------------------------------------------------------------
+# Materials Explorer tests (Plan 03)
+# ---------------------------------------------------------------------------
+
+from dashboard.pages.materials_explorer import (  # noqa: E402
+    _extract_elements,
+    filter_materials,
+)
+
+
+def test_materials_filter_voltage(sample_materials_df):
+    """Filtering by voltage range returns correct subset."""
+    filtered = filter_materials(
+        sample_materials_df,
+        voltage_range=(3.5, 4.0),
+    )
+    # Only materials with voltage between 3.5 and 4.0
+    assert len(filtered) > 0
+    assert all(3.5 <= v <= 4.0 for v in filtered["voltage"])
+    # mp-2 (3.4) and mp-5 (3.2) excluded
+    assert len(filtered) < len(sample_materials_df)
+
+
+def test_materials_filter_elements(sample_materials_df):
+    """Filtering by elements returns only matching formulas."""
+    filtered = filter_materials(
+        sample_materials_df,
+        elements=["Fe"],
+    )
+    # LiFePO4 and LiFeO2 contain Fe
+    assert len(filtered) == 2
+    for formula in filtered["formula"]:
+        assert "Fe" in formula
+
+
+def test_materials_filter_stability(sample_materials_df):
+    """Stable-only filter excludes unstable materials."""
+    filtered = filter_materials(
+        sample_materials_df,
+        stable_only=True,
+    )
+    assert len(filtered) == 2  # mp-1 and mp-2 are stable
+    assert all(filtered["is_stable"])
+
+
+def test_discovery_ranking(sample_materials_df):
+    """Ranking by voltage returns materials sorted descending."""
+    filtered = filter_materials(sample_materials_df)
+    ranked = filtered.sort_values("voltage", ascending=False)
+    assert ranked.iloc[0]["voltage"] >= ranked.iloc[-1]["voltage"]
+    # Highest voltage is 4.0 (LiMnO2)
+    assert ranked.iloc[0]["voltage"] == 4.0
