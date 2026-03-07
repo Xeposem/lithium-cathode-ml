@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_plan: Plan 01 of 04
+current_plan: Plan 02 of 04
 status: in-progress
 last_updated: "2026-03-07T09:11:35.913Z"
 progress:
   total_phases: 6
   completed_phases: 5
   total_plans: 17
-  completed_plans: 14
+  completed_plans: 15
 ---
 
 # Project State
@@ -36,8 +36,8 @@ See: .planning/PROJECT.md (updated 2026-03-05)
 
 **Phase 6: Dashboard and Documentation**
 Status: In Progress
-Plans: 1/4
-Current Plan: Plan 01 of 04
+Plans: 2/4
+Current Plan: Plan 02 of 04
 
 ## Accumulated Context
 
@@ -57,6 +57,9 @@ Current Plan: Plan 01 of 04
 - Baselines with featurization (fast end-to-end validation)
 - Compositional group splitting from day one (prevents leakage)
 - Streamlit for dashboard (not Dash -- simpler, fast development, sufficient for dataset scale)
+- Identity decorator fallback for st.cache_resource in test environments
+- Dynamic model discovery by scanning baselines/*.joblib filenames
+- Tabs layout for composition vs CIF input modes on Predict page
 - matgl v1.3.0 for MEGNet (NOT v2.0.0 -- MEGNet not yet ported to PyG in v2)
 - Matminer v0.9.3 Magpie preset produces no all-NaN columns for single-element compositions; drop logic retained for robustness
 - Two-stage GroupShuffleSplit: test first, then val from remainder with adjusted fraction
@@ -97,4 +100,4 @@ None
 
 ---
 *Last updated: 2026-03-07*
-*Last session: Completed 06-01-PLAN.md (Dashboard foundation and core pages)*
+*Last session: Completed 06-02-PLAN.md (Predict page and Crystal Viewer)*

@@ -44,12 +44,12 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Dashboard
 
 - [x] **DASH-01**: Web dashboard displays model comparison metrics in tables and charts
-- [ ] **DASH-02**: Dashboard allows interactive prediction: user inputs composition/structure, gets predicted properties
+- [x] **DASH-02**: Dashboard allows interactive prediction: user inputs composition/structure, gets predicted properties
 - [ ] **DASH-03**: Dashboard includes data explorer: browse, filter, and visualize dataset distributions
 - [x] **DASH-04**: Dashboard displays training curves (loss, learning rate, convergence) per model
 - [ ] **DASH-05**: Dashboard includes materials explorer: searchable database filterable by voltage, formation energy, capacity, elements, stability threshold
 - [ ] **DASH-06**: Dashboard includes materials discovery panel showing top candidate materials ranked by predicted properties
-- [ ] **DASH-07**: Dashboard includes crystal structure 3D viewer using py3Dmol or equivalent
+- [x] **DASH-07**: Dashboard includes crystal structure 3D viewer using py3Dmol or equivalent
 
 ### Reproducibility
 
@@ -121,12 +121,12 @@ Deferred to future release. Tracked but not in current roadmap.
 | EVAL-04 | Phase 5 | Complete |
 | EVAL-05 | Phase 5 | Complete |
 | DASH-01 | Phase 6 | Complete |
-| DASH-02 | Phase 6 | Pending |
+| DASH-02 | Phase 6 | Complete |
 | DASH-03 | Phase 6 | Pending |
 | DASH-04 | Phase 6 | Complete |
 | DASH-05 | Phase 6 | Pending |
 | DASH-06 | Phase 6 | Pending |
-| DASH-07 | Phase 6 | Pending |
+| DASH-07 | Phase 6 | Complete |
 | REPR-01 | Phase 1 | Complete |
 | REPR-02 | Phase 1 | Complete |
 | REPR-03 | Phase 1 | Complete |
