@@ -87,7 +87,12 @@ Plans:
   3. Bar chart comparisons show model performance side-by-side across all properties, making relative strengths immediately visible
   4. Training/learning curves (loss and validation MAE per epoch) are plotted for both GNN models
   5. A CLI command runs the full pipeline (fetch, clean, featurize, train, evaluate) end-to-end with one invocation
-**Plans:** TBD
+**Plans:** 3 plans
+
+Plans:
+- [ ] 05-01-PLAN.md — Evaluation metrics module with unified result loading and comparison tables
+- [ ] 05-02-PLAN.md — Publication-quality plotting (parity, bar charts, learning curves) and evaluation CLI
+- [ ] 05-03-PLAN.md — Full pipeline orchestrator with argparse CLI and stage execution
 
 ### Phase 6: Dashboard and Documentation
 **Goal:** Users explore results, materials, and predictions interactively through a web dashboard, and the README provides complete project context
@@ -112,7 +117,7 @@ Plans:
 | 2. Featurization and Baseline Models | 3/3 | Complete   | 2026-03-06 |
 | 3. CGCNN Implementation | 1/2 | In progress | - |
 | 4. MEGNet Implementation | 0/2 | Not started | - |
-| 5. Evaluation and Benchmarking | 0/0 | Not started | - |
+| 5. Evaluation and Benchmarking | 0/3 | Not started | - |
 | 6. Dashboard and Documentation | 0/0 | Not started | - |
 
 ---
