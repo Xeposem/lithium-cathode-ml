@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_plan: Plan 01 of 03
+current_plan: Plan 03 of 03
 status: in-progress
-last_updated: "2026-03-07T07:27:18.871Z"
+last_updated: "2026-03-07T07:32:07.034Z"
 progress:
   total_phases: 6
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 13
-  completed_plans: 11
+  completed_plans: 13
 ---
 
 # Project State
@@ -29,15 +29,15 @@ See: .planning/PROJECT.md (updated 2026-03-05)
 | 2 | Featurization and Baseline Models | Complete (3/3 plans) | FEAT-01, FEAT-02, FEAT-03, FEAT-04, MODL-03, MODL-04 |
 | 3 | CGCNN Implementation | Complete (2/2 plans) | MODL-01, MODL-05, MODL-06, MODL-07 |
 | 4 | MEGNet Implementation | Complete (2/2 plans) | MODL-02 |
-| 5 | Evaluation and Benchmarking | In Progress (1/3 plans) | EVAL-01, EVAL-02, EVAL-03, EVAL-04, EVAL-05, REPR-04 |
+| 5 | Evaluation and Benchmarking | Complete (3/3 plans) | EVAL-01, EVAL-02, EVAL-03, EVAL-04, EVAL-05, REPR-04 |
 | 6 | Dashboard and Documentation | Pending | DASH-01, DASH-02, DASH-03, DASH-04, DASH-05, DASH-06, DASH-07, DOCS-01, DOCS-02, DOCS-03, DOCS-04 |
 
 ## Current Phase
 
 **Phase 5: Evaluation and Benchmarking**
-Status: In Progress
-Plans: 1/3
-Current Plan: Plan 01 of 03
+Status: Complete
+Plans: 3/3
+Current Plan: Plan 03 of 03
 
 ## Accumulated Context
 
@@ -75,6 +75,10 @@ Current Plan: Plan 01 of 03
 - Separated _run_lightning_training for clean mocking; train_megnet_for_property accepts pre-computed indices
 - Heading per property in markdown comparison tables (### property_name) for structured output
 - Italic footnote for MEGNet dagger symbol in comparison tables
+- Parity plots deferred in CLI until prediction arrays available (Plan 03 integration)
+- Learning curves grid: rows=properties, cols=models (CGCNN, MEGNet only)
+- Evaluate stage gracefully skips plots module if not yet available (plan 05-02 not yet executed)
+- Featurize stage is pass-through log since featurization happens inline in training orchestrators
 
 ### Research Flags
 - Phase 4 (MEGNet): matgl v1.3.0 + PyTorch compatibility untested; may need separate conda env
@@ -90,4 +94,4 @@ None
 
 ---
 *Last updated: 2026-03-07*
-*Last session: Completed 05-01-PLAN.md (Evaluation metrics and comparison tables)*
+*Last session: Completed 05-03-PLAN.md (CLI pipeline orchestrator)*

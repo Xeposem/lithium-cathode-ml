@@ -37,9 +37,9 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [x] **EVAL-01**: System evaluates all models with MAE, RMSE, and R-squared metrics
 - [x] **EVAL-02**: System uses consistent cross-validation folds across all models for fair comparison
-- [ ] **EVAL-03**: System generates parity plots (predicted vs actual) for each model and property
-- [ ] **EVAL-04**: System generates bar chart comparisons of model performance across properties
-- [ ] **EVAL-05**: System generates learning/training curves (loss, validation MAE per epoch)
+- [x] **EVAL-03**: System generates parity plots (predicted vs actual) for each model and property
+- [x] **EVAL-04**: System generates bar chart comparisons of model performance across properties
+- [x] **EVAL-05**: System generates learning/training curves (loss, validation MAE per epoch)
 
 ### Dashboard
 
@@ -56,7 +56,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **REPR-01**: System uses fixed random seeds across all experiments
 - [x] **REPR-02**: System provides pinned dependency file (requirements.txt or environment.yml)
 - [x] **REPR-03**: System uses YAML configuration files for all hyperparameters and settings
-- [ ] **REPR-04**: System provides CLI entry points to run full pipeline (fetch, clean, featurize, train, evaluate)
+- [x] **REPR-04**: System provides CLI entry points to run full pipeline (fetch, clean, featurize, train, evaluate)
 
 ### Documentation
 
@@ -117,9 +117,9 @@ Deferred to future release. Tracked but not in current roadmap.
 | MODL-07 | Phase 3 | Complete |
 | EVAL-01 | Phase 5 | Complete |
 | EVAL-02 | Phase 5 | Complete |
-| EVAL-03 | Phase 5 | Pending |
-| EVAL-04 | Phase 5 | Pending |
-| EVAL-05 | Phase 5 | Pending |
+| EVAL-03 | Phase 5 | Complete |
+| EVAL-04 | Phase 5 | Complete |
+| EVAL-05 | Phase 5 | Complete |
 | DASH-01 | Phase 6 | Pending |
 | DASH-02 | Phase 6 | Pending |
 | DASH-03 | Phase 6 | Pending |
@@ -130,7 +130,7 @@ Deferred to future release. Tracked but not in current roadmap.
 | REPR-01 | Phase 1 | Complete |
 | REPR-02 | Phase 1 | Complete |
 | REPR-03 | Phase 1 | Complete |
-| REPR-04 | Phase 5 | Pending |
+| REPR-04 | Phase 5 | Complete |
 | DOCS-01 | Phase 6 | Pending |
 | DOCS-02 | Phase 6 | Pending |
 | DOCS-03 | Phase 6 | Pending |

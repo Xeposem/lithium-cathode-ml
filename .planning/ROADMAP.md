@@ -10,7 +10,7 @@
 - [x] **Phase 2: Featurization and Baseline Models** - Crystal-to-graph conversion, Magpie descriptors, and sklearn baselines that validate the pipeline end-to-end (completed 2026-03-06)
 - [ ] **Phase 3: CGCNN Implementation** - First GNN architecture with training infrastructure, transfer learning, and multi-property prediction
 - [ ] **Phase 4: MEGNet Implementation** - Second GNN architecture via matgl, isolated to contain DGL dependency risk
-- [ ] **Phase 5: Evaluation and Benchmarking** - Rigorous cross-model comparison with publication-quality figures and CLI pipeline
+- [x] **Phase 5: Evaluation and Benchmarking** - Rigorous cross-model comparison with publication-quality figures and CLI pipeline (completed 2026-03-07)
 - [ ] **Phase 6: Dashboard and Documentation** - Interactive Streamlit dashboard and comprehensive README
 
 ## Phase Details
@@ -87,7 +87,7 @@ Plans:
   3. Bar chart comparisons show model performance side-by-side across all properties, making relative strengths immediately visible
   4. Training/learning curves (loss and validation MAE per epoch) are plotted for both GNN models
   5. A CLI command runs the full pipeline (fetch, clean, featurize, train, evaluate) end-to-end with one invocation
-**Plans:** 3 plans
+**Plans:** 3/3 plans complete
 
 Plans:
 - [ ] 05-01-PLAN.md — Evaluation metrics module with unified result loading and comparison tables
@@ -117,7 +117,7 @@ Plans:
 | 2. Featurization and Baseline Models | 3/3 | Complete   | 2026-03-06 |
 | 3. CGCNN Implementation | 1/2 | In progress | - |
 | 4. MEGNet Implementation | 0/2 | Not started | - |
-| 5. Evaluation and Benchmarking | 0/3 | Not started | - |
+| 5. Evaluation and Benchmarking | 3/3 | Complete   | 2026-03-07 |
 | 6. Dashboard and Documentation | 0/0 | Not started | - |
 
 ---
