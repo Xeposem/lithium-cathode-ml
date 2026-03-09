@@ -108,6 +108,9 @@ None
 ### Todos
 None
 
+### Roadmap Evolution
+- Phase 9 added: Replace MEGNet with M3GNet and TensorNet from matgl 2.x
+
 ---
-*Last updated: 2026-03-07*
-*Last session: Completed 08-01-PLAN.md (Fix Dashboard Cross-Phase Wiring)*
+*Last updated: 2026-03-08*
+*Last session: Added Phase 9 (MEGNet → M3GNet/TensorNet migration)*
