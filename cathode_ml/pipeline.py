@@ -2,12 +2,13 @@
 
 Orchestrates fetch -> featurize -> train -> evaluate with a single
 command, supporting --skip-fetch, --skip-train, --models, and --seed
-flags. All heavy imports are lazy (inside stage functions) to keep
+flags. Supports RF, XGBoost, CGCNN, M3GNet, and TensorNet models.
+All heavy imports are lazy (inside stage functions) to keep
 ``--help`` fast.
 
 Usage:
     python -m cathode_ml.pipeline
-    python -m cathode_ml.pipeline --skip-fetch --models rf cgcnn
+    python -m cathode_ml.pipeline --skip-fetch --models rf cgcnn m3gnet
     python -m cathode_ml.pipeline --skip-train --seed 123
 """
 
@@ -39,9 +40,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--models",
         nargs="+",
-        choices=["rf", "xgb", "cgcnn", "megnet"],
-        default=["rf", "xgb", "cgcnn", "megnet"],
-        help="Models to train/evaluate (default: all four)",
+        choices=["rf", "xgb", "cgcnn", "m3gnet", "tensornet"],
+        default=["rf", "xgb", "cgcnn", "m3gnet", "tensornet"],
+        help="Models to train/evaluate (default: all five)",
     )
     parser.add_argument(
         "--skip-fetch",
@@ -127,15 +128,29 @@ def run_train_stage(args: argparse.Namespace) -> None:
             seed=args.seed,
         )
 
-    # MEGNet
-    if "megnet" in args.models:
-        from cathode_ml.models.train_megnet import train_megnet  # noqa: C0415
+    # M3GNet
+    if "m3gnet" in args.models:
+        from cathode_ml.models.train_m3gnet import train_m3gnet  # noqa: C0415
 
-        megnet_config = load_config(str(config_dir / "megnet.yaml"))
-        train_megnet(
+        m3gnet_config = load_config(str(config_dir / "m3gnet.yaml"))
+        logger.info("Training M3GNet models...")
+        train_m3gnet(
             records=records,
             features_config=features_config,
-            megnet_config=megnet_config,
+            m3gnet_config=m3gnet_config,
+            seed=args.seed,
+        )
+
+    # TensorNet
+    if "tensornet" in args.models:
+        from cathode_ml.models.train_tensornet import train_tensornet  # noqa: C0415
+
+        tensornet_config = load_config(str(config_dir / "tensornet.yaml"))
+        logger.info("Training TensorNet models...")
+        train_tensornet(
+            records=records,
+            features_config=features_config,
+            tensornet_config=tensornet_config,
             seed=args.seed,
         )
 
