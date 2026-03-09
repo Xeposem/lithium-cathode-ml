@@ -30,7 +30,7 @@ def mock_predictions() -> dict:
     """Create mock model predictions for parity plot testing."""
     rng = np.random.default_rng(42)
     preds = {}
-    for model_key in ["rf", "xgb", "cgcnn", "megnet"]:
+    for model_key in ["rf", "xgb", "cgcnn", "m3gnet", "tensornet"]:
         y_true = rng.standard_normal(50)
         y_pred = y_true + rng.standard_normal(50) * 0.1
         preds[model_key] = {
@@ -45,7 +45,7 @@ def mock_predictions() -> dict:
 @pytest.fixture()
 def mock_csv_dir(tmp_path: Path) -> Path:
     """Create mock CSV files for learning curve testing."""
-    for model in ["cgcnn", "megnet"]:
+    for model in ["cgcnn", "m3gnet", "tensornet"]:
         model_dir = tmp_path / model
         model_dir.mkdir()
         for prop in ["formation_energy_per_atom", "voltage"]:
@@ -57,7 +57,7 @@ def mock_csv_dir(tmp_path: Path) -> Path:
                     for epoch in range(1, 11):
                         writer.writerow([epoch, 1.0 / epoch, 1.1 / epoch, 0.5 / epoch, 0.001])
                 else:
-                    # MEGNet: no lr column
+                    # M3GNet/TensorNet: no lr column (Lightning format)
                     writer.writerow(["epoch", "train_loss", "val_loss", "val_mae", "train_mae"])
                     for epoch in range(1, 11):
                         writer.writerow([epoch, 1.0 / epoch, 1.1 / epoch, 0.5 / epoch, 0.6 / epoch])
@@ -92,8 +92,8 @@ class TestPlotParity:
         assert out.exists()
         assert out.stat().st_size > 0
 
-    def test_plot_parity_2x2_layout(self, tmp_path: Path, mock_predictions: dict):
-        """Generated figure has 2x2 subplot grid."""
+    def test_plot_parity_grid_layout(self, tmp_path: Path, mock_predictions: dict):
+        """Generated figure has enough subplots for all models."""
         from cathode_ml.evaluation.plots import apply_nature_style, plot_parity
 
         apply_nature_style()
@@ -115,7 +115,7 @@ class TestPlotParity:
 
         fig = fig_holder["fig"]
         axes = fig.get_axes()
-        assert len(axes) == 4
+        assert len(axes) >= 5  # At least 5 subplots for 5 models
 
     def test_plot_parity_annotations(self, tmp_path: Path, mock_predictions: dict):
         """Each panel has R-squared and MAE text annotations."""
@@ -225,7 +225,7 @@ class TestPlotLearningCurves:
         assert out.exists()
 
     def test_plot_learning_curves_handles_missing_lr(self, tmp_path: Path, mock_csv_dir: Path):
-        """MEGNet CSV without lr column plots successfully."""
+        """M3GNet/TensorNet CSV without lr column plots successfully."""
         from cathode_ml.evaluation.plots import apply_nature_style, plot_learning_curves
 
         apply_nature_style()

@@ -198,8 +198,8 @@ class TestStructurePrediction:
             "model_loader.py should NOT import structure_to_pyg_data"
         )
 
-    def test_megnet_raw_state_dict_loading(self):
-        """MEGNet loader handles raw state_dict (no 'model_state_dict' key)."""
+    def test_m3gnet_raw_state_dict_loading(self):
+        """M3GNet loader handles raw state_dict (no 'model_state_dict' key)."""
         import ast
 
         source_path = Path("dashboard/utils/model_loader.py")
@@ -209,16 +209,25 @@ class TestStructurePrediction:
         assert "isinstance(checkpoint, dict)" in source or (
             "model_state_dict" in source
             and "else" in source
-        ), "MEGNet loader should handle both raw state_dict and wrapped format"
+        ), "M3GNet loader should handle both raw state_dict and wrapped format"
 
         # More specifically: should not unconditionally access checkpoint["model_state_dict"]
-        # Parse AST to find the megnet branch
         tree = ast.parse(source)
-        # Check that there's a conditional check before accessing the key
         assert 'checkpoint["model_state_dict"]' not in source or (
             "isinstance(checkpoint" in source
             or "if" in source.split('checkpoint["model_state_dict"]')[0].split("\n")[-1]
-        ), "MEGNet loader should not unconditionally access checkpoint['model_state_dict']"
+        ), "M3GNet loader should not unconditionally access checkpoint['model_state_dict']"
+
+    def test_tensornet_state_dict_loading(self):
+        """TensorNet loader section exists and handles state_dict loading."""
+        source_path = Path("dashboard/utils/model_loader.py")
+        source = source_path.read_text()
+
+        # Verify TensorNet branch exists in load_gnn_model
+        assert "tensornet" in source, "model_loader.py should handle tensornet"
+        assert "build_tensornet_from_config" in source, (
+            "TensorNet loader should use build_tensornet_from_config"
+        )
 
 
 class TestPageModuleLevelMain:

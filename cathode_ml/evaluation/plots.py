@@ -70,8 +70,15 @@ def plot_parity(
             y_true, y_pred (arrays), mae, r2 (floats).
         output_path: File path for the output PNG.
     """
-    fig, axes = plt.subplots(2, 2, figsize=(6, 6))
+    n_models = len(MODELS_ORDER)
+    n_cols = 3
+    n_rows = (n_models + n_cols - 1) // n_cols
+    fig, axes = plt.subplots(n_rows, n_cols, figsize=(3 * n_cols, 3 * n_rows))
     axes_flat = axes.flatten()
+
+    # Hide extra subplots
+    for i in range(n_models, len(axes_flat)):
+        axes_flat[i].set_visible(False)
 
     for idx, model_key in enumerate(MODELS_ORDER):
         ax = axes_flat[idx]

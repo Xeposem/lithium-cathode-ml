@@ -29,7 +29,7 @@ class TestBuildParser:
         args = parser.parse_args([])
         assert args.skip_fetch is False
         assert args.skip_train is False
-        assert args.models == ["rf", "xgb", "cgcnn", "megnet"]
+        assert args.models == ["rf", "xgb", "cgcnn", "m3gnet", "tensornet"]
         assert args.seed == 42
 
     def test_build_parser_skip_flags(self):
@@ -157,14 +157,15 @@ class TestRunTrainStage:
             setattr(args, key, val)
         return args
 
-    @patch("cathode_ml.models.train_megnet.train_megnet")
+    @patch("cathode_ml.models.train_tensornet.train_tensornet")
+    @patch("cathode_ml.models.train_m3gnet.train_m3gnet")
     @patch("cathode_ml.models.train_cgcnn.train_cgcnn")
     @patch("cathode_ml.models.baselines.run_baselines")
     @patch("cathode_ml.config.load_config")
     def test_loads_separate_config_files(
-        self, mock_load_config, mock_baselines, mock_cgcnn, mock_megnet
+        self, mock_load_config, mock_baselines, mock_cgcnn, mock_m3gnet, mock_tensornet
     ):
-        """run_train_stage calls load_config with features.yaml, baselines.yaml, cgcnn.yaml, megnet.yaml -- not data.yaml."""
+        """run_train_stage calls load_config with features.yaml, baselines.yaml, cgcnn.yaml, m3gnet.yaml, tensornet.yaml -- not data.yaml."""
         # load_config returns a minimal dict for each call
         mock_load_config.return_value = {
             "target_properties": ["formation_energy_per_atom"],
@@ -183,7 +184,7 @@ class TestRunTrainStage:
         with patch("builtins.open", MagicMock()), \
              patch("json.load", return_value=fake_records):
             args = self._make_args(
-                models=["rf", "xgb", "cgcnn", "megnet"], config_dir="configs"
+                models=["rf", "xgb", "cgcnn", "m3gnet", "tensornet"], config_dir="configs"
             )
             from cathode_ml.pipeline import run_train_stage
 
@@ -202,20 +203,24 @@ class TestRunTrainStage:
         assert any("cgcnn.yaml" in p for p in called_paths), (
             f"Expected cgcnn.yaml in calls, got: {called_paths}"
         )
-        assert any("megnet.yaml" in p for p in called_paths), (
-            f"Expected megnet.yaml in calls, got: {called_paths}"
+        assert any("m3gnet.yaml" in p for p in called_paths), (
+            f"Expected m3gnet.yaml in calls, got: {called_paths}"
+        )
+        assert any("tensornet.yaml" in p for p in called_paths), (
+            f"Expected tensornet.yaml in calls, got: {called_paths}"
         )
         # Should NOT use data.yaml
         assert not any("data.yaml" in p for p in called_paths), (
             f"Should not call load_config with data.yaml, got: {called_paths}"
         )
 
-    @patch("cathode_ml.models.train_megnet.train_megnet")
+    @patch("cathode_ml.models.train_tensornet.train_tensornet")
+    @patch("cathode_ml.models.train_m3gnet.train_m3gnet")
     @patch("cathode_ml.models.train_cgcnn.train_cgcnn")
     @patch("cathode_ml.models.baselines.run_baselines")
     @patch("cathode_ml.config.load_config")
     def test_loads_processed_records(
-        self, mock_load_config, mock_baselines, mock_cgcnn, mock_megnet
+        self, mock_load_config, mock_baselines, mock_cgcnn, mock_m3gnet, mock_tensornet
     ):
         """run_train_stage reads records from data/processed/materials.json (not DataCache)."""
         mock_load_config.return_value = {
@@ -236,7 +241,7 @@ class TestRunTrainStage:
         with patch("builtins.open", mock_file), \
              patch("json.load", return_value=fake_records):
             args = self._make_args(
-                models=["rf", "xgb", "cgcnn", "megnet"], config_dir="configs"
+                models=["rf", "xgb", "cgcnn", "m3gnet", "tensornet"], config_dir="configs"
             )
             from cathode_ml.pipeline import run_train_stage
 
