@@ -20,7 +20,16 @@ _INSTALL_MSG = (
 
 
 def _import_matgl():
-    """Lazy import of matgl with helpful error message."""
+    """Lazy import of matgl with DGL backend for M3GNet compatibility.
+
+    M3GNet is a DGL-only model in matgl 2.x.  The ``MATGL_BACKEND``
+    environment variable must be set **before** the first matgl import
+    so that ``matgl.layers.__init__`` exports the DGL-specific classes
+    (e.g. ``EmbeddingBlock``) that M3GNet requires.
+    """
+    import os
+
+    os.environ.setdefault("MATGL_BACKEND", "dgl")
     try:
         import matgl
     except ImportError:
@@ -46,7 +55,9 @@ def load_m3gnet_model(model_name: str = "M3GNet-MP-2018.6.1-Eform"):
     matgl = _import_matgl()
     logger.info("Loading pretrained M3GNet model: %s", model_name)
     model = matgl.load_model(model_name)
-    logger.info("Model loaded (cutoff=%.2f)", model.cutoff)
+    # matgl 2.x wraps models in TransformedTargetModel; cutoff is on the inner model
+    cutoff = getattr(model, "cutoff", None) or getattr(model.model, "cutoff", None)
+    logger.info("Model loaded (cutoff=%.2f)", cutoff)
     return model
 
 

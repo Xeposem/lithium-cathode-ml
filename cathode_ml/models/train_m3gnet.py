@@ -114,8 +114,10 @@ def _run_lightning_training(
         seed: Random seed.
     """
     # Lazy imports for matgl/DGL/Lightning
+    import os
     from functools import partial
 
+    os.environ.setdefault("MATGL_BACKEND", "dgl")
     import matgl
     from matgl.ext.pymatgen import Structure2Graph, get_element_list
     from matgl.graph.data import MGLDataset, collate_fn_graph
@@ -135,7 +137,9 @@ def _run_lightning_training(
     element_types = get_element_list(all_structures)
 
     # Build Structure2Graph converter using pretrained model's cutoff
-    converter = Structure2Graph(element_types=element_types, cutoff=model.cutoff)
+    # matgl 2.x wraps models in TransformedTargetModel; cutoff is on the inner model
+    cutoff = getattr(model, "cutoff", None) or getattr(model.model, "cutoff", None)
+    converter = Structure2Graph(element_types=element_types, cutoff=cutoff)
 
     # Create datasets with M3GNet-specific threebody_cutoff and include_line_graph
     train_dataset = MGLDataset(
