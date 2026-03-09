@@ -158,7 +158,7 @@ Plans:
 | 6. Dashboard and Documentation | 4/4 | Complete   | 2026-03-07 |
 | 7. Fix Pipeline Orchestrator Wiring | 1/1 | Complete   | 2026-03-07 |
 | 8. Fix Dashboard Cross-Phase Wiring | 0/1 | Not started | - |
-| 9. Replace MEGNet with M3GNet and TensorNet | 1/4 | In progress | - |
+| 9. Replace MEGNet with M3GNet and TensorNet | 2/4 | In progress | - |
 
 ### Phase 9: Replace MEGNet with M3GNet and TensorNet from matgl 2.x
 
@@ -176,7 +176,7 @@ Plans:
 
 Plans:
 - [x] 09-01-PLAN.md -- Core model wrappers (m3gnet.py, tensornet.py), YAML configs, requirements.txt
-- [ ] 09-02-PLAN.md -- Training orchestrators (train_m3gnet.py, train_tensornet.py) and pipeline.py update
+- [x] 09-02-PLAN.md -- Training orchestrators (train_m3gnet.py, train_tensornet.py) and pipeline.py update
 - [ ] 09-03-PLAN.md -- Evaluation, dashboard, and documentation updates (metrics, plots, model_loader, README)
 - [ ] 09-04-PLAN.md -- Tests (test_m3gnet.py, test_tensornet.py), integration test updates, MEGNet file deletion
 
