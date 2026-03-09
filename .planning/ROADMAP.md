@@ -159,5 +159,25 @@ Plans:
 | 7. Fix Pipeline Orchestrator Wiring | 1/1 | Complete   | 2026-03-07 |
 | 8. Fix Dashboard Cross-Phase Wiring | 0/1 | Not started | - |
 
+### Phase 9: Replace MEGNet with M3GNet and TensorNet from matgl 2.x
+
+**Goal:** MEGNet is replaced by M3GNet (pretrained, fine-tuned) and TensorNet (from-scratch, O(3)-equivariant) using matgl 2.x APIs, with full pipeline integration, evaluation, dashboard support, and test coverage
+**Depends on:** Phase 8
+**Requirements:** MODL-02
+**Success Criteria** (what must be TRUE):
+  1. M3GNet model loads pretrained weights from matgl 2.x (M3GNet-MP-2018.6.1-Eform), trains with include_line_graph=True and threebody_cutoff, and produces predictions for all target properties
+  2. TensorNet model constructs from config (no pretrained property models), trains with O(3) equivariance, and produces predictions for all target properties
+  3. Both models use identical compositional splits as CGCNN and baselines, with results in the same JSON artifact format
+  4. Pipeline CLI offers m3gnet and tensornet as model choices (megnet removed), and all five models run end-to-end
+  5. Dashboard loads M3GNet and TensorNet checkpoints, displays their metrics, and supports structure-based prediction
+  6. Zero MEGNet references remain in the active codebase; old MEGNet files are deleted
+**Plans:** 4 plans
+
+Plans:
+- [ ] 09-01-PLAN.md -- Core model wrappers (m3gnet.py, tensornet.py), YAML configs, requirements.txt
+- [ ] 09-02-PLAN.md -- Training orchestrators (train_m3gnet.py, train_tensornet.py) and pipeline.py update
+- [ ] 09-03-PLAN.md -- Evaluation, dashboard, and documentation updates (metrics, plots, model_loader, README)
+- [ ] 09-04-PLAN.md -- Tests (test_m3gnet.py, test_tensornet.py), integration test updates, MEGNet file deletion
+
 ---
 *Last updated: 2026-03-07*
