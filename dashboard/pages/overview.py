@@ -24,7 +24,7 @@ def _render() -> None:
     st.markdown("""
     This dashboard presents the results of a comparative study of machine learning
     models for predicting lithium cathode material properties from crystal structure.
-    Four models were evaluated -- Random Forest, XGBoost, CGCNN, and MEGNet --
+    Five models were evaluated -- Random Forest, XGBoost, CGCNN, M3GNet, and TensorNet --
     across four target properties: formation energy, voltage, capacity, and energy
     above hull.
     """)

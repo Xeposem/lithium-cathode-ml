@@ -74,7 +74,7 @@ def _render() -> None:
     st.subheader("Training Curves")
     st.caption("Baselines (RF, XGBoost) do not have per-epoch training curves.")
 
-    gnn_models = ["cgcnn", "megnet"]
+    gnn_models = ["cgcnn", "m3gnet", "tensornet"]
     cols = st.columns(len(gnn_models))
 
     for col, model in zip(cols, gnn_models):

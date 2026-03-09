@@ -71,7 +71,7 @@ def load_gnn_model(
     """Load a GNN model checkpoint and reconstruct the model.
 
     Args:
-        model_name: Model name ("cgcnn" or "megnet").
+        model_name: Model name ("cgcnn", "m3gnet", or "tensornet").
         property_name: Target property name (e.g. "voltage").
         results_base: Base results directory containing model checkpoints.
         configs_dir: Directory with YAML config files.
@@ -112,42 +112,79 @@ def load_gnn_model(
             logger.error("Failed to load CGCNN for %s: %s", property_name, exc)
             return None
 
-    elif model_name == "megnet":
+    elif model_name == "m3gnet":
         checkpoint_path = (
-            Path(results_base) / "megnet" / f"megnet_{property_name}_best.pt"
+            Path(results_base) / "m3gnet" / f"m3gnet_{property_name}_best.pt"
         )
         if not checkpoint_path.exists():
-            logger.warning("MEGNet checkpoint not found: %s", checkpoint_path)
+            logger.warning("M3GNet checkpoint not found: %s", checkpoint_path)
             return None
 
         try:
-            from cathode_ml.models.megnet import _import_matgl
+            from cathode_ml.models.m3gnet import _import_matgl
 
             matgl = _import_matgl()
             if matgl is None:
-                logger.warning("matgl not available -- cannot load MEGNet")
+                logger.warning("matgl not available -- cannot load M3GNet")
                 return None
 
             checkpoint = torch.load(checkpoint_path, map_location="cpu")
-            # MEGNet state dict is extracted from matgl model
-            # Reconstruct from pretrained then load fine-tuned weights
             import yaml
 
-            with open(Path(configs_dir) / "megnet.yaml") as f:
-                megnet_config = yaml.safe_load(f)
+            with open(Path(configs_dir) / "m3gnet.yaml") as f:
+                m3gnet_config = yaml.safe_load(f)
 
-            pretrained_name = megnet_config["model"]["pretrained_model"]
+            pretrained_name = m3gnet_config["model"]["pretrained_model"]
             model = matgl.load_model(pretrained_name)
             if isinstance(checkpoint, dict) and "model_state_dict" in checkpoint:
                 state_dict = checkpoint["model_state_dict"]
             else:
-                state_dict = checkpoint  # Raw state_dict (MEGNet format)
+                state_dict = checkpoint
             model.model.load_state_dict(state_dict)
             model.model.eval()
-            logger.info("Loaded MEGNet model for %s", property_name)
+            logger.info("Loaded M3GNet model for %s", property_name)
             return model
         except Exception as exc:
-            logger.error("Failed to load MEGNet for %s: %s", property_name, exc)
+            logger.error("Failed to load M3GNet for %s: %s", property_name, exc)
+            return None
+
+    elif model_name == "tensornet":
+        checkpoint_path = (
+            Path(results_base) / "tensornet" / f"tensornet_{property_name}_best.pt"
+        )
+        if not checkpoint_path.exists():
+            logger.warning("TensorNet checkpoint not found: %s", checkpoint_path)
+            return None
+
+        try:
+            from cathode_ml.models.tensornet import build_tensornet_from_config
+
+            import yaml
+
+            with open(Path(configs_dir) / "tensornet.yaml") as f:
+                tensornet_config = yaml.safe_load(f)
+
+            checkpoint = torch.load(checkpoint_path, map_location="cpu")
+            if isinstance(checkpoint, dict) and "element_types" in checkpoint:
+                element_types = checkpoint["element_types"]
+                state_dict = checkpoint.get("model_state_dict", checkpoint)
+            else:
+                # Raw state_dict -- use a broad element list for cathode materials
+                element_types = [
+                    "Li", "Na", "K", "Fe", "Co", "Ni", "Mn",
+                    "V", "Ti", "Cr", "Cu", "Zn", "Al", "Mg",
+                    "O", "S", "P", "F", "N", "C", "Si", "B",
+                ]
+                state_dict = checkpoint
+            model = build_tensornet_from_config(
+                tensornet_config["model"], element_types
+            )
+            model.model.load_state_dict(state_dict)
+            model.model.eval()
+            logger.info("Loaded TensorNet model for %s", property_name)
+            return model
+        except Exception as exc:
+            logger.error("Failed to load TensorNet for %s: %s", property_name, exc)
             return None
 
     else:
@@ -236,7 +273,7 @@ def predict_from_structure(
 
     results: dict = {}
 
-    for gnn_name in ["cgcnn", "megnet"]:
+    for gnn_name in ["cgcnn", "m3gnet", "tensornet"]:
         for prop in PROPERTIES:
             model = load_gnn_model(
                 gnn_name, prop,
@@ -259,8 +296,8 @@ def predict_from_structure(
                     data.batch = torch.zeros(data.x.size(0), dtype=torch.long)
                     with torch.no_grad():
                         pred = model(data).item()
-                elif gnn_name == "megnet":
-                    # MEGNet uses matgl's predict_structure
+                elif gnn_name in ("m3gnet", "tensornet"):
+                    # M3GNet and TensorNet use matgl's predict_structure
                     with torch.no_grad():
                         pred = float(model.predict_structure(structure))
 

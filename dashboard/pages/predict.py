@@ -32,7 +32,8 @@ MODEL_LABELS = {
     "rf": "Random Forest",
     "xgb": "XGBoost",
     "cgcnn": "CGCNN",
-    "megnet": "MEGNet",
+    "m3gnet": "M3GNet",
+    "tensornet": "TensorNet",
 }
 
 
