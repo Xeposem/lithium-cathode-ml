@@ -144,6 +144,8 @@ class GNNTrainer:
             "early_stopped": False,
         }
 
+        log_interval = max(1, n_epochs // 20)  # Log ~20 times during training
+
         for epoch in range(1, n_epochs + 1):
             train_loss = self.train_epoch(train_loader)
             val_metrics = self.validate(val_loader)
@@ -171,16 +173,19 @@ class GNNTrainer:
                 self.patience_counter = 0
                 best_path = self.results_dir / f"{self.checkpoint_prefix}_best.pt"
                 self.save_checkpoint(str(best_path), epoch, val_loss)
-                logger.debug(
-                    "Epoch %d: val_loss=%.6f (new best), saved %s",
-                    epoch, val_loss, best_path.name,
-                )
+                if epoch % log_interval == 0 or epoch == 1:
+                    logger.info(
+                        "  Epoch %d/%d: train=%.6f val=%.6f mae=%.4f lr=%.1e (new best)",
+                        epoch, n_epochs, train_loss, val_loss, val_mae, current_lr,
+                    )
             else:
                 self.patience_counter += 1
-                logger.debug(
-                    "Epoch %d: val_loss=%.6f (patience %d/%d)",
-                    epoch, val_loss, self.patience_counter, self.patience,
-                )
+                if epoch % log_interval == 0:
+                    logger.info(
+                        "  Epoch %d/%d: train=%.6f val=%.6f mae=%.4f lr=%.1e (patience %d/%d)",
+                        epoch, n_epochs, train_loss, val_loss, val_mae, current_lr,
+                        self.patience_counter, self.patience,
+                    )
 
             # Early stopping
             if self.patience_counter >= self.patience:

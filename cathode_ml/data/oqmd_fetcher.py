@@ -64,6 +64,55 @@ class OQMDFetcher:
         """Convert MaterialRecord list to serializable dict."""
         return {"records": [asdict(r) for r in records]}
 
+    @staticmethod
+    def _parse_site(site_str: str):
+        """Parse OQMD site string like 'Li @ 0.5 0.5 0.5' into (species, coords).
+
+        Returns:
+            Tuple of (species_str, [x, y, z]) or None if unparseable.
+        """
+        parts = site_str.split("@")
+        if len(parts) != 2:
+            return None
+        species = parts[0].strip()
+        try:
+            coords = [float(x) for x in parts[1].strip().split()]
+        except ValueError:
+            return None
+        if len(coords) != 3:
+            return None
+        return species, coords
+
+    def _build_structure_dict(self, entry: dict) -> dict:
+        """Build a pymatgen-compatible structure dict from OQMD unit_cell + sites.
+
+        Args:
+            entry: Single OQMD API entry with 'unit_cell' and 'sites' fields.
+
+        Returns:
+            Dict compatible with pymatgen Structure.from_dict(), or empty dict
+            if the entry lacks sufficient structural data.
+        """
+        unit_cell = entry.get("unit_cell")
+        sites_raw = entry.get("sites")
+        if not unit_cell or not sites_raw:
+            return {}
+
+        parsed = [self._parse_site(s) for s in sites_raw]
+        if not all(parsed):
+            return {}
+
+        species = [p[0] for p in parsed]
+        frac_coords = [p[1] for p in parsed]
+
+        try:
+            from pymatgen.core import Lattice, Structure
+            lattice = Lattice(unit_cell)
+            structure = Structure(lattice, species, frac_coords)
+            return structure.as_dict()
+        except Exception:
+            return {}
+
     def _entry_to_record(self, entry: dict) -> MaterialRecord:
         """Convert a single OQMD entry to MaterialRecord.
 
@@ -78,8 +127,7 @@ class OQMDFetcher:
         formula = entry.get("name", entry.get("composition", "unknown"))
         space_group = entry.get("spacegroup", None)
 
-        # OQMD REST API typically does not return full crystal structure
-        structure_dict = {}
+        structure_dict = self._build_structure_dict(entry)
 
         return MaterialRecord(
             material_id=material_id,
@@ -87,7 +135,7 @@ class OQMDFetcher:
             structure_dict=structure_dict,
             source="oqmd",
             formation_energy_per_atom=entry.get("delta_e"),
-            energy_above_hull=None,
+            energy_above_hull=entry.get("stability"),
             voltage=None,
             capacity=None,
             is_stable=None,
@@ -119,26 +167,45 @@ class OQMDFetcher:
             List of entry dicts from OQMD.
         """
         results = []
+        data_available = None
+        filter_expr = (
+            f"element_set={self.config['element_set']}"
+            f" AND stability<{self.config['stability_max']}"
+        )
         params = {
-            "element_set": self.config["element_set"],
-            "stability": f"<{self.config['stability_max']}",
+            "filter": filter_expr,
             "limit": 100,
             "offset": 0,
         }
 
         while True:
-            self.logger.info(
-                "HTTP request to OQMD: offset=%d", params["offset"]
-            )
-            resp = requests.get(self.OQMD_API_URL, params=params)
+            for attempt in range(3):
+                resp = requests.get(self.OQMD_API_URL, params=params)
+                if resp.status_code == 502 and attempt < 2:
+                    import time
+                    wait = 5 * (attempt + 1)
+                    self.logger.warning(
+                        "502 Bad Gateway, retrying in %ds (attempt %d/3)",
+                        wait, attempt + 1,
+                    )
+                    time.sleep(wait)
+                    continue
+                break
             resp.raise_for_status()
             page = resp.json()
             results.extend(page.get("data", []))
 
+            if data_available is None:
+                data_available = page.get("meta", {}).get("data_available", "?")
+                self.logger.info("OQMD reports %s total records", data_available)
+
+            self.logger.info(
+                "OQMD progress: %d / %s fetched", len(results), data_available
+            )
+
             # Check for next page
             next_url = page.get("next")
             if not next_url:
-                # Also check nested links format
                 links = page.get("links", {})
                 next_url = links.get("next") if isinstance(links, dict) else None
 
