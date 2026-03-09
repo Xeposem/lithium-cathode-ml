@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_plan: Complete
-status: completed
-last_updated: "2026-03-07T10:52:28.528Z"
+current_plan: "09-01"
+status: in_progress
+last_updated: "2026-03-09T03:29:28Z"
 progress:
-  total_phases: 8
+  total_phases: 9
   completed_phases: 8
-  total_plans: 19
-  completed_plans: 19
+  total_plans: 23
+  completed_plans: 20
 ---
 
 # Project State
@@ -19,7 +19,7 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-05)
 
 **Core value:** Accurate, reproducible prediction of cathode performance properties from crystal structure, with clear model comparison and publication-quality results
-**Current focus:** Phase 8
+**Current focus:** Phase 9
 
 ## Progress
 
@@ -33,13 +33,14 @@ See: .planning/PROJECT.md (updated 2026-03-05)
 | 6 | Dashboard and Documentation | Complete (4/4 plans) | DASH-01, DASH-02, DASH-03, DASH-04, DASH-05, DASH-06, DASH-07, DOCS-01, DOCS-02, DOCS-03, DOCS-04 |
 | 7 | Fix Pipeline Orchestrator Wiring | Complete (1/1 plans) | EVAL-01, EVAL-02, EVAL-03, DATA-04 |
 | 8 | Fix Dashboard Cross-Phase Wiring | Complete (1/1 plans) | DASH-01, DASH-02, DASH-03, DASH-05, DASH-06, DASH-07 |
+| 9 | Replace MEGNet with M3GNet and TensorNet | In Progress (1/4 plans) | MODL-02 |
 
 ## Current Phase
 
-**Phase 8: Fix Dashboard Cross-Phase Wiring**
-Status: Complete
-Plans: 1/1
-Current Plan: Complete
+**Phase 9: Replace MEGNet with M3GNet and TensorNet from matgl 2.x**
+Status: In Progress
+Plans: 1/4
+Current Plan: 09-02
 
 ## Accumulated Context
 
@@ -95,6 +96,10 @@ Current Plan: Complete
 - Patch cathode_ml.config.load_config (definition site) since pipeline uses lazy imports
 - Keep backward compatibility for legacy DataCache wrapper format in get_cached_records
 - Pass full features config dict to structure_to_graph (not individual graph params)
+- M3GNet default model is M3GNet-MP-2018.6.1-Eform (formation energy, same domain as MEGNet)
+- TensorNet uses config-driven build pattern (build_tensornet_from_config) matching CGCNN pattern
+- M3GNet config uses CosineAnnealingLR params (decay_steps, decay_alpha) matching matgl 2.x defaults
+- lightning>=2.0.0 added as explicit dependency (matgl 2.x uses import lightning as L)
 
 ### Research Flags
 - Phase 4 (MEGNet): matgl v1.3.0 + PyTorch compatibility untested; may need separate conda env
@@ -112,5 +117,5 @@ None
 - Phase 9 added: Replace MEGNet with M3GNet and TensorNet from matgl 2.x
 
 ---
-*Last updated: 2026-03-08*
-*Last session: Added Phase 9 (MEGNet → M3GNet/TensorNet migration)*
+*Last updated: 2026-03-09*
+*Last session: Completed 09-01 (M3GNet/TensorNet model wrappers, configs, deps)*
