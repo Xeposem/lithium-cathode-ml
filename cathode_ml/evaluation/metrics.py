@@ -1,8 +1,9 @@
 """Unified result loading and comparison table generation.
 
-Loads JSON result artifacts from all four model types (RF, XGBoost,
-CGCNN, MEGNet), normalizes them into a unified comparison structure,
-and generates publication-quality markdown + JSON comparison tables.
+Loads JSON result artifacts from all five model types (RF, XGBoost,
+CGCNN, M3GNet, TensorNet), normalizes them into a unified comparison
+structure, and generates publication-quality markdown + JSON comparison
+tables.
 """
 
 from __future__ import annotations
@@ -18,18 +19,20 @@ MODEL_COLORS: dict[str, str] = {
     "rf": "#0072B2",
     "xgb": "#D55E00",
     "cgcnn": "#009E73",
-    "megnet": "#CC79A7",
+    "m3gnet": "#CC79A7",
+    "tensornet": "#E69F00",
 }
 
-# Display labels (dagger for pretrained MEGNet)
+# Display labels (dagger for pretrained M3GNet)
 MODEL_LABELS: dict[str, str] = {
     "rf": "RF",
     "xgb": "XGBoost",
     "cgcnn": "CGCNN",
-    "megnet": "MEGNet\u2020",
+    "m3gnet": "M3GNet\u2020",
+    "tensornet": "TensorNet",
 }
 
-MODELS_ORDER: list[str] = ["rf", "xgb", "cgcnn", "megnet"]
+MODELS_ORDER: list[str] = ["rf", "xgb", "cgcnn", "m3gnet", "tensornet"]
 
 PROPERTIES: list[str] = [
     "formation_energy_per_atom",
@@ -38,15 +41,15 @@ PROPERTIES: list[str] = [
     "energy_above_hull",
 ]
 
-# Footnote for pretrained MEGNet
-_MEGNET_FOOTNOTE = "\u2020 Fine-tuned from pretrained MEGNet-MP-2019.4.1"
+# Footnote for pretrained M3GNet
+_M3GNET_FOOTNOTE = "\u2020 Fine-tuned from pretrained M3GNet-MP-2018.6.1-Eform"
 
 
 def load_all_results(results_base: str = "data/results") -> dict:
     """Load results from all model types into a unified dictionary.
 
-    Reads JSON result files from baselines (RF, XGBoost), CGCNN, and
-    MEGNet subdirectories and normalizes into a single structure:
+    Reads JSON result files from baselines (RF, XGBoost), CGCNN, M3GNet,
+    and TensorNet subdirectories and normalizes into a single structure:
     ``{property: {model: {mae, rmse, r2, n_train, n_test}}}``.
 
     Args:
@@ -84,18 +87,31 @@ def load_all_results(results_base: str = "data/results") -> dict:
     else:
         logger.warning("CGCNN results not found: %s", cgcnn_path)
 
-    # --- MEGNet ---
-    megnet_path = base / "megnet" / "megnet_results.json"
-    if megnet_path.exists():
+    # --- M3GNet ---
+    m3gnet_path = base / "m3gnet" / "m3gnet_results.json"
+    if m3gnet_path.exists():
         try:
-            with open(megnet_path) as f:
-                megnet = json.load(f)
-            for prop, models in megnet.items():
+            with open(m3gnet_path) as f:
+                m3gnet = json.load(f)
+            for prop, models in m3gnet.items():
                 unified.setdefault(prop, {}).update(models)
         except (json.JSONDecodeError, OSError) as exc:
-            logger.warning("Failed to load MEGNet results: %s", exc)
+            logger.warning("Failed to load M3GNet results: %s", exc)
     else:
-        logger.warning("MEGNet results not found: %s", megnet_path)
+        logger.warning("M3GNet results not found: %s", m3gnet_path)
+
+    # --- TensorNet ---
+    tensornet_path = base / "tensornet" / "tensornet_results.json"
+    if tensornet_path.exists():
+        try:
+            with open(tensornet_path) as f:
+                tensornet = json.load(f)
+            for prop, models in tensornet.items():
+                unified.setdefault(prop, {}).update(models)
+        except (json.JSONDecodeError, OSError) as exc:
+            logger.warning("Failed to load TensorNet results: %s", exc)
+    else:
+        logger.warning("TensorNet results not found: %s", tensornet_path)
 
     return unified
 
@@ -155,11 +171,11 @@ def generate_comparison_table(all_results: dict, property_name: str) -> str:
         r2_str = _fmt(r2, r2 == best_r2)
         lines.append(f"| {label} | {mae_str} | {rmse_str} | {r2_str} |")
 
-    # Add footnote if MEGNet is present
-    has_megnet = any(r[0] == "megnet" for r in rows)
-    if has_megnet:
+    # Add footnote if M3GNet is present
+    has_m3gnet = any(r[0] == "m3gnet" for r in rows)
+    if has_m3gnet:
         lines.append("")
-        lines.append(f"_{_MEGNET_FOOTNOTE}_")
+        lines.append(f"_{_M3GNET_FOOTNOTE}_")
 
     lines.append("")
     return "\n".join(lines)

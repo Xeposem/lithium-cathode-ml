@@ -62,8 +62,7 @@ def plot_parity(
 ) -> None:
     """Generate a 2x2 parity plot for a single property.
 
-    Creates a figure with one panel per model (RF top-left, XGBoost top-right,
-    CGCNN bottom-left, MEGNet bottom-right). Missing models get invisible panels.
+    Creates a figure with one panel per model. Missing models get invisible panels.
 
     Args:
         property_name: Target property key.
@@ -194,7 +193,7 @@ def plot_learning_curves(results_base: str, output_path: str) -> None:
     """Generate learning curves grid from per-epoch training CSVs.
 
     Reads CSV files at ``{results_base}/{model}/{property}_metrics.csv``
-    for CGCNN and MEGNet. Grid: rows=properties, cols=models.
+    for CGCNN, M3GNet, and TensorNet. Grid: rows=properties, cols=models.
     Missing files show "No data" text.
 
     Args:
@@ -202,7 +201,7 @@ def plot_learning_curves(results_base: str, output_path: str) -> None:
         output_path: File path for the output PNG.
     """
     base = Path(results_base)
-    gnn_models = ["cgcnn", "megnet"]
+    gnn_models = ["cgcnn", "m3gnet", "tensornet"]
     n_rows = len(PROPERTIES)
     n_cols = len(gnn_models)
 

@@ -1,7 +1,7 @@
 """Evaluation metrics, comparison tables, and figure generation for cathode ML models.
 
 Provides unified result loading across all model types (RF, XGBoost,
-CGCNN, MEGNet), publication-quality comparison table generation,
+CGCNN, M3GNet, TensorNet), publication-quality comparison table generation,
 and Nature-style figure plotting (parity, bar charts, learning curves).
 """
 
