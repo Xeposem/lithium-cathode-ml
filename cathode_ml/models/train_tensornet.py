@@ -195,10 +195,19 @@ def _run_lightning_training(
         mode="min",
     )
 
-    # Configure trainer
+    # Configure trainer — detect DGL CUDA support to avoid runtime error
+    # when DGL is CPU-only but PyTorch sees a GPU
+    _accel = "auto"
+    try:
+        import dgl
+
+        dgl.DGLGraph().to("cuda")
+    except Exception:
+        _accel = "cpu"
+
     trainer = L.Trainer(
         max_epochs=max_epochs,
-        accelerator="auto",
+        accelerator=_accel,
         logger=csv_logger,
         callbacks=[checkpoint_callback, early_stop_callback],
         enable_progress_bar=True,
