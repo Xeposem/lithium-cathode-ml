@@ -1,0 +1,26 @@
+# TensorNet model configuration for cathode property prediction
+# Trained from scratch -- no pretrained property prediction models available
+# O(3)-equivariant tensor network architecture
+
+model:
+  units: 64
+  nblocks: 2
+  num_rbf: 32
+  cutoff: 5.0
+  rbf_type: "Gaussian"
+  readout_type: "weighted_atom"
+  activation_type: "swish"
+  equivariance_invariance_group: "O(3)"
+  is_intensive: true
+  ntargets: 1
+
+training:
+  learning_rate: 0.001
+  batch_size: 128
+  n_epochs: 1000
+  early_stopping_patience: 100
+  loss: "mse_loss"
+  decay_steps: 1000
+  decay_alpha: 0.01
+
+results_dir: "data/results/tensornet"

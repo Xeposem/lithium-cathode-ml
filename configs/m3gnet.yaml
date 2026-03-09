@@ -1,0 +1,26 @@
+# M3GNet model configuration for cathode property prediction
+# Fine-tunes pretrained M3GNet from matgl 2.x
+# M3GNet uses 3-body interactions (requires include_line_graph=True in training)
+
+model:
+  pretrained_model: "M3GNet-MP-2018.6.1-Eform"
+  # Architecture params inherited from pretrained model -- do not override
+  # dim_node_embedding: 64
+  # dim_edge_embedding: 64
+  # nblocks: 3
+  # units: 64
+  # cutoff: 5.0
+  # threebody_cutoff: 4.0
+  # readout_type: "set2set"
+  # is_intensive: true
+
+training:
+  learning_rate: 0.001         # matgl 2.x default (CosineAnnealingLR)
+  batch_size: 128
+  n_epochs: 1000
+  early_stopping_patience: 100
+  loss: "mse_loss"
+  decay_steps: 1000            # CosineAnnealingLR T_max
+  decay_alpha: 0.01            # Minimum LR fraction
+
+results_dir: "data/results/m3gnet"
