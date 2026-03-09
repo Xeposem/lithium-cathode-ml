@@ -1,7 +1,7 @@
 """Crystal structure to PyG graph conversion with Gaussian distance expansion.
 
 Converts pymatgen Structure objects into torch_geometric Data objects
-suitable for graph neural networks (CGCNN, MEGNet).
+suitable for graph neural networks (CGCNN, M3GNet, TensorNet).
 
 Uses scipy KDTree with periodic images for PBC-aware neighbor finding
 (avoids pymatgen Cython buffer dtype issue on some platforms).

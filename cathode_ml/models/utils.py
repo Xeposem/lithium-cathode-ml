@@ -1,7 +1,7 @@
 """Shared evaluation utilities for cathode ML models.
 
 Provides metric computation and result saving used by both baseline
-(RF, XGBoost) and deep learning (CGCNN, MEGNet) model pipelines.
+(RF, XGBoost) and deep learning (CGCNN, M3GNet, TensorNet) model pipelines.
 """
 
 from __future__ import annotations

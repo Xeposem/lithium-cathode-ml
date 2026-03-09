@@ -6,7 +6,7 @@
 
 Lithium-ion batteries are central to the global transition toward renewable energy, yet identifying optimal cathode materials remains a bottleneck. Key performance indicators -- voltage, capacity, formation energy, and thermodynamic stability -- depend on complex structure-property relationships that are expensive to evaluate through first-principles computation alone. Machine learning offers a path to rapid, accurate screening of candidate cathode materials, potentially accelerating the discovery cycle by orders of magnitude.
 
-This project benchmarks two families of models on a curated multi-source dataset of lithium cathode materials. Traditional ML baselines (Random Forest, XGBoost) operate on 132-dimensional Magpie composition descriptors, capturing elemental statistics without explicit structural information. Graph neural networks (CGCNN, MEGNet) operate directly on crystal graphs, encoding atomic environments and bond geometries. By comparing these approaches under identical evaluation conditions -- compositional group splitting, consistent metrics, shared data -- we quantify the value of structural information for each target property.
+This project benchmarks two families of models on a curated multi-source dataset of lithium cathode materials. Traditional ML baselines (Random Forest, XGBoost) operate on 132-dimensional Magpie composition descriptors, capturing elemental statistics without explicit structural information. Graph neural networks (CGCNN, M3GNet, TensorNet) operate directly on crystal graphs, encoding atomic environments and bond geometries. By comparing these approaches under identical evaluation conditions -- compositional group splitting, consistent metrics, shared data -- we quantify the value of structural information for each target property.
 
 The result is a reproducible, end-to-end pipeline from raw data ingestion through model training, evaluation, and interactive exploration via a Streamlit dashboard.
 
@@ -30,7 +30,9 @@ Records are deduplicated using source priority (Materials Project > OQMD > Batte
 
 **CGCNN (Crystal Graph Convolutional Neural Network):** Following Xie & Grossman (2018), crystal structures are represented as graphs where nodes are atoms and edges connect neighbors within a cutoff radius. Node features are one-hot element embeddings; edge features use Gaussian distance expansion. PyTorch Geometric CGConv layers propagate information through the graph, and a global mean pooling layer produces a fixed-length representation for property regression.
 
-**MEGNet (Materials Graph Network):** A pre-trained MEGNet model (MEGNet-MP-2018.6.1-Eform) fine-tuned via the matgl library. MEGNet augments the atom-bond graph with global state features capturing bulk material properties. Fine-tuning from a model pre-trained on 60,000+ Materials Project entries provides strong inductive bias, especially beneficial when target datasets are small.
+**M3GNet (Materials 3-body Graph Network):** An invariant GNN with 3-body interactions, fine-tuned from the pretrained M3GNet-MP-2018.6.1-Eform model via the matgl 2.x library. M3GNet captures many-body interactions through explicit three-body terms (bond angles), providing richer structural encoding than pairwise-only models. Fine-tuning from a model pre-trained on 60,000+ Materials Project entries provides strong inductive bias, especially beneficial when target datasets are small.
+
+**TensorNet:** An O(3)-equivariant tensor network trained from scratch using the matgl 2.x library. TensorNet represents atomic interactions as Cartesian tensors, maintaining rotational equivariance without spherical harmonics. This architecture is particularly effective for properties sensitive to directional bonding environments.
 
 ### Design Choices
 
@@ -62,7 +64,7 @@ If the evaluation pipeline has been executed, a visual comparison is available:
 
 ![Model Comparison](data/results/figures/bar_comparison.png)
 
-**Interpretation:** Graph neural networks (CGCNN, MEGNet) tend to outperform composition-only baselines on properties that depend strongly on crystal structure (e.g., formation energy, stability), where bond geometries and atomic environments carry information not captured by elemental statistics alone. For composition-dominated properties like voltage, traditional baselines remain competitive, suggesting that elemental chemistry is the primary driver.
+**Interpretation:** Graph neural networks (CGCNN, M3GNet, TensorNet) tend to outperform composition-only baselines on properties that depend strongly on crystal structure (e.g., formation energy, stability), where bond geometries and atomic environments carry information not captured by elemental statistics alone. For composition-dominated properties like voltage, traditional baselines remain competitive, suggesting that elemental chemistry is the primary driver.
 
 ## Dashboard
 
@@ -110,7 +112,8 @@ All experiment settings are managed through YAML files in the `configs/` directo
 | `features.yaml` | Composition descriptor settings, graph construction parameters |
 | `baselines.yaml` | Random Forest and XGBoost hyperparameters |
 | `cgcnn.yaml` | CGCNN architecture, training schedule, and cutoff radius |
-| `megnet.yaml` | MEGNet fine-tuning settings and pre-trained model selection |
+| `m3gnet.yaml` | M3GNet fine-tuning settings and pre-trained model selection |
+| `tensornet.yaml` | TensorNet architecture and training configuration |
 
 ### Running the Pipeline
 
@@ -124,7 +127,7 @@ python -m cathode_ml
 
 1. **Fetch** -- Download and cache data from Materials Project, OQMD, and Battery Data Genome
 2. **Featurize** -- Composition descriptors and crystal graphs are computed inline during training
-3. **Train** -- Train all four model architectures on each target property
+3. **Train** -- Train all five model architectures on each target property
 4. **Evaluate** -- Generate comparison tables, bar charts, and learning curves
 
 **Selective execution:**
@@ -133,7 +136,7 @@ python -m cathode_ml
 python -m cathode_ml --skip-fetch          # Use cached data (skip download)
 python -m cathode_ml --skip-train          # Use saved models (skip training)
 python -m cathode_ml --models rf xgb       # Train only baseline models
-python -m cathode_ml --models cgcnn megnet # Train only GNN models
+python -m cathode_ml --models cgcnn m3gnet tensornet  # Train only GNN models
 python -m cathode_ml --seed 123            # Set random seed for reproducibility
 ```
 
@@ -185,8 +188,10 @@ lithium-cathode-ml/
 │   │   ├── baselines.py         # RF and XGBoost training
 │   │   ├── cgcnn.py             # CGCNN architecture (PyG)
 │   │   ├── train_cgcnn.py       # CGCNN training orchestrator
-│   │   ├── megnet.py            # MEGNet wrapper (matgl)
-│   │   ├── train_megnet.py      # MEGNet fine-tuning orchestrator
+│   │   ├── m3gnet.py            # M3GNet wrapper (matgl 2.x)
+│   │   ├── train_m3gnet.py      # M3GNet fine-tuning orchestrator
+│   │   ├── tensornet.py         # TensorNet wrapper (matgl 2.x)
+│   │   ├── train_tensornet.py   # TensorNet training orchestrator
 │   │   ├── trainer.py           # Model-agnostic GNN trainer
 │   │   └── utils.py             # Shared utilities (compute_metrics)
 │   └── evaluation/              # Benchmarking and visualization
@@ -210,7 +215,8 @@ lithium-cathode-ml/
 │   ├── features.yaml
 │   ├── baselines.yaml
 │   ├── cgcnn.yaml
-│   └── megnet.yaml
+│   ├── m3gnet.yaml
+│   └── tensornet.yaml
 ├── data/                        # Data directory (gitignored contents)
 │   └── results/                 # Model outputs, metrics, figures
 ├── tests/                       # Test suite
@@ -232,6 +238,6 @@ If you use this work in your research, please cite:
 @software{lithium_cathode_ml,
   title={Lithium-Ion Battery Cathode Performance Prediction},
   year={2026},
-  url={https://github.com/your-username/lithium-cathode-ml}
+  url={https://github.com/Xeposem/lithium-cathode-ml}
 }
 ```

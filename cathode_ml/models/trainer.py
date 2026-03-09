@@ -1,7 +1,7 @@
 """Generic GNN trainer with early stopping, checkpointing, and CSV logging.
 
 Provides a reusable training loop for any PyG-compatible nn.Module.
-Used by CGCNN (Phase 3) and MEGNet (Phase 4) training pipelines.
+Used by CGCNN. M3GNet and TensorNet use matgl Lightning training.
 """
 
 from __future__ import annotations
