@@ -1,10 +1,10 @@
 ---
 gsd_state_version: 1.0
 milestone: v1.0
-milestone_name: milestone
-current_plan: 09-04 (final)
-status: completed
-last_updated: "2026-03-09T03:57:00.506Z"
+milestone_name: MVP
+current_plan: null
+status: milestone_complete
+last_updated: "2026-03-13"
 progress:
   total_phases: 9
   completed_phases: 9
@@ -16,106 +16,19 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-03-05)
+See: .planning/PROJECT.md (updated 2026-03-13)
 
 **Core value:** Accurate, reproducible prediction of cathode performance properties from crystal structure, with clear model comparison and publication-quality results
-**Current focus:** Phase 9
+**Current focus:** Planning next milestone
 
 ## Progress
 
-| Phase | Name | Status | Requirements |
-|-------|------|--------|-------------|
-| 1 | Data Pipeline and Project Foundation | Complete (3/3 plans) | DATA-01, DATA-02, DATA-03, DATA-04, DATA-05, DATA-06, REPR-01, REPR-02, REPR-03 |
-| 2 | Featurization and Baseline Models | Complete (3/3 plans) | FEAT-01, FEAT-02, FEAT-03, FEAT-04, MODL-03, MODL-04 |
-| 3 | CGCNN Implementation | Complete (2/2 plans) | MODL-01, MODL-05, MODL-06, MODL-07 |
-| 4 | MEGNet Implementation | Complete (2/2 plans) | MODL-02 |
-| 5 | Evaluation and Benchmarking | Complete (3/3 plans) | EVAL-01, EVAL-02, EVAL-03, EVAL-04, EVAL-05, REPR-04 |
-| 6 | Dashboard and Documentation | Complete (4/4 plans) | DASH-01, DASH-02, DASH-03, DASH-04, DASH-05, DASH-06, DASH-07, DOCS-01, DOCS-02, DOCS-03, DOCS-04 |
-| 7 | Fix Pipeline Orchestrator Wiring | Complete (1/1 plans) | EVAL-01, EVAL-02, EVAL-03, DATA-04 |
-| 8 | Fix Dashboard Cross-Phase Wiring | Complete (1/1 plans) | DASH-01, DASH-02, DASH-03, DASH-05, DASH-06, DASH-07 |
-| 9 | Replace MEGNet with M3GNet and TensorNet | Complete (4/4 plans) | MODL-02 |
-
-## Current Phase
-
-**Phase 9: Replace MEGNet with M3GNet and TensorNet from matgl 2.x**
-Status: Complete
-Plans: 4/4
-Current Plan: 09-04 (final)
+v1.0 MVP — Complete (9 phases, 23 plans)
 
 ## Accumulated Context
 
 ### Key Decisions
-- DataCache.load() returns only data field, not wrapper (clean API for fetchers)
-- MD5 hash for cache keys (deterministic, acceptable collision risk at project scale)
-- Explicit FileNotFoundError in load_config for clear error messages
-- Lazy import pattern for heavy science deps (mp-api, qmpy-rester) to avoid version conflicts at import time
-- OQMD structure_dict is empty dict (REST API does not return full crystal structure)
-- Electrode join via material_ids list iteration from each electrode doc
-- BDG fetcher is a CSV file downloader, not API client (BDG is not a single API)
-- Deduplication uses source priority: MP > OQMD > BDG
-- IQR outlier removal skips when fewer than 4 data points
-- Fetcher imports in fetch.py use try/except for robustness
-- Separate models per property (not multi-output) per research recommendation
-- CGCNN before MEGNet (zero dependency conflicts vs matgl/DGL risk)
-- Baselines with featurization (fast end-to-end validation)
-- Compositional group splitting from day one (prevents leakage)
-- Streamlit for dashboard (not Dash -- simpler, fast development, sufficient for dataset scale)
-- Identity decorator fallback for st.cache_resource in test environments
-- Dynamic model discovery by scanning baselines/*.joblib filenames
-- Tabs layout for composition vs CIF input modes on Predict page
-- matgl v1.3.0 for MEGNet (NOT v2.0.0 -- MEGNet not yet ported to PyG in v2)
-- Matminer v0.9.3 Magpie preset produces no all-NaN columns for single-element compositions; drop logic retained for robustness
-- Two-stage GroupShuffleSplit: test first, then val from remainder with adjusted fraction
-- scipy KDTree with periodic images instead of pymatgen get_all_neighbors (Cython dtype bug on Windows)
-- Lazy import for xgboost in train_baseline (only loaded when model_type='xgb')
-- Minimum 5 valid records per property to train baselines (skip otherwise)
-- Softplus activation in CGCNN FC head (smooth, differentiable, standard for regression)
-- compute_metrics accepts raw arrays (not model object) for GNN compatibility
-- Config-driven model construction pattern: build_X_from_config(model_config, features_config)
-- GNNTrainer is model-agnostic (any nn.Module + PyG DataLoader) for MEGNet reuse in Phase 4
-- Seeds reset before each property model init for reproducible weight initialization
-- Per-property sequential training loop matching baselines pattern (skip if <5 records)
-- MEGNet-MP-2018.6.1-Eform as default pretrained model (confirmed in matgl tutorials)
-- Lazy imports for all matgl usage with centralized _import_matgl() helper
-- get_megnet_state_dict extracts model.model.state_dict() for .pt format compatibility
-- Separated _run_lightning_training for clean mocking; train_megnet_for_property accepts pre-computed indices
-- Heading per property in markdown comparison tables (### property_name) for structured output
-- Italic footnote for MEGNet dagger symbol in comparison tables
-- Parity plots deferred in CLI until prediction arrays available (Plan 03 integration)
-- Learning curves grid: rows=properties, cols=models (CGCNN, MEGNet only)
-- Evaluate stage gracefully skips plots module if not yet available (plan 05-02 not yet executed)
-- Featurize stage is pass-through log since featurization happens inline in training orchestrators
-- _render() function pattern in dashboard pages for safe import outside Streamlit runtime
-- use_container_width=True for Plotly charts in Streamlit dashboard
-- Re-export MODEL_COLORS/LABELS/ORDER/PROPERTIES from data_loader for dashboard convenience
-- Separated filter_materials() as pure function from Streamlit UI for unit testability
-- NaN values pass through range filters to avoid dropping records with missing data
-- _extract_elements uses regex [A-Z][a-z]? for robust element extraction from formulas
-- Placeholder results table in README with note to update after training (actual values depend on data availability)
-- Import json as _json inside run_train_stage to avoid shadowing module-level names
-- Patch cathode_ml.config.load_config (definition site) since pipeline uses lazy imports
-- Keep backward compatibility for legacy DataCache wrapper format in get_cached_records
-- Pass full features config dict to structure_to_graph (not individual graph params)
-- M3GNet default model is M3GNet-MP-2018.6.1-Eform (formation energy, same domain as MEGNet)
-- TensorNet uses config-driven build pattern (build_tensornet_from_config) matching CGCNN pattern
-- M3GNet config uses CosineAnnealingLR params (decay_steps, decay_alpha) matching matgl 2.x defaults
-- lightning>=2.0.0 added as explicit dependency (matgl 2.x uses import lightning as L)
-- Use torch.utils.data.DataLoader (not MGLDataLoader) with matgl collate_fn for pre-split datasets
-- M3GNet uses include_line_graph=True + threebody_cutoff=4.0; TensorNet uses include_line_graph=False
-- TensorNet derives element_types from all structures (train+val+test) for complete element coverage
-- partial(collate_fn_graph, include_line_graph=bool) pattern for matgl 2.x data loading
-
-- M3GNet inherits MEGNet pink (#CC79A7); TensorNet gets Wong palette amber (#E69F00)
-- TensorNet dashboard loader uses fallback element list for cathode materials when checkpoint lacks element_types
-- M3GNet and TensorNet share predict_structure branch in dashboard predict_from_structure
-- sys.modules pre-population pattern for testing lazy imports from uninstalled packages (matgl)
-- Dynamic parity plot grid layout (n_cols=3) to accommodate 5 models
-
-### Research Flags
-- Phase 4 (MEGNet): matgl v1.3.0 + PyTorch compatibility untested; may need separate conda env
-- Phase 3 (CGCNN): Transfer learning from full MP (~150K entries) needs strategy research during planning
-- OQMD: qmpy_rester unmaintained since 2019; may need direct HTTP fallback
-- Battery Data Genome: Resolved -- implemented as CSV file downloader with graceful degradation
+See PROJECT.md Key Decisions table for full history.
 
 ### Blockers
 None
@@ -123,9 +36,6 @@ None
 ### Todos
 None
 
-### Roadmap Evolution
-- Phase 9 added: Replace MEGNet with M3GNet and TensorNet from matgl 2.x
-
 ---
-*Last updated: 2026-03-08*
-*Last session: Completed 09-04 (M3GNet/TensorNet test suites, integration test updates, MEGNet file deletion)*
+*Last updated: 2026-03-13*
+*Last session: Completed v1.0 milestone archival*
