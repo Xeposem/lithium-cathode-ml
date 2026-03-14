@@ -24,10 +24,14 @@ ENV/
 # Environment variables
 .env
 
-# Data (cached API responses, processed data)
+# Data (cached API responses, processed data, Battery Archive)
 data/raw/
 data/processed/
 data/logs/
+data/cache/
+data/results/
+data/battery_archive/*.csv
+*.zip
 
 # Testing
 .pytest_cache/

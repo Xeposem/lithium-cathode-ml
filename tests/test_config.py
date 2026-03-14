@@ -46,7 +46,8 @@ class TestLoadConfig:
         sources = config["data_sources"]
         assert "materials_project" in sources
         assert "oqmd" in sources
-        assert "battery_data_genome" in sources
+        assert "aflow" in sources
+        assert "jarvis" in sources
 
 
 class TestSetSeeds:

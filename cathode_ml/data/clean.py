@@ -208,7 +208,8 @@ class CleaningPipeline:
         SOURCE_PRIORITY = {
             "materials_project": 0,
             "oqmd": 1,
-            "battery_data_genome": 2,
+            "aflow": 2,
+            "jarvis": 3,
         }
 
         result = []

@@ -29,8 +29,26 @@ def _identity_decorator(func=None, **kwargs):
     return lambda f: f
 
 
+_st_mock._is_test_mock = True
 _st_mock.cache_data = _identity_decorator
 _st_mock.cache_resource = _identity_decorator
+_st_mock.columns = lambda n: [MagicMock() for _ in range(n)]
+def _mock_slider(*args, **kwargs):
+    val = kwargs.get("value")
+    if val is not None:
+        return val
+    # If min/max given positionally: slider(label, min, max, default)
+    if len(args) >= 4:
+        return args[3]
+    return (0.0, 1.0)
+
+def _mock_selectbox(*args, **kwargs):
+    options = kwargs.get("options") or (args[1] if len(args) > 1 else [])
+    return list(options)[0] if options else None
+
+_st_mock.slider = _mock_slider
+_st_mock.multiselect = lambda *args, **kwargs: kwargs.get("default", [])
+_st_mock.selectbox = _mock_selectbox
 sys.modules.setdefault("streamlit", _st_mock)
 
 
@@ -245,7 +263,7 @@ def sample_materials_df():
     return pd.DataFrame({
         "material_id": ["mp-1", "mp-2", "mp-3", "mp-4", "mp-5"],
         "formula": ["LiCoO2", "LiFePO4", "LiMnO2", "LiNiO2", "LiFeO2"],
-        "source": ["materials_project", "materials_project", "oqmd", "oqmd", "battery_data_genome"],
+        "source": ["materials_project", "materials_project", "oqmd", "aflow", "jarvis"],
         "formation_energy_per_atom": [-1.5, -1.2, -0.8, -1.0, -0.5],
         "voltage": [3.9, 3.4, 4.0, 3.7, 3.2],
         "capacity": [140.0, 170.0, 148.0, 200.0, 120.0],

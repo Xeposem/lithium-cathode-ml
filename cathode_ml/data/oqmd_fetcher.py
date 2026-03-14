@@ -174,30 +174,65 @@ class OQMDFetcher:
         )
         params = {
             "filter": filter_expr,
-            "limit": 100,
+            "limit": 50,
             "offset": 0,
         }
 
+        self.logger.info(
+            "HTTP fetch starting: url=%s filter=%r limit=%d",
+            self.OQMD_API_URL, filter_expr, params["limit"],
+        )
+
+        session = requests.Session()
+
         while True:
-            for attempt in range(3):
-                resp = requests.get(self.OQMD_API_URL, params=params)
-                if resp.status_code == 502 and attempt < 2:
+            self.logger.debug("Requesting offset=%d", params["offset"])
+            for attempt in range(100):
+                try:
+                    resp = session.get(
+                        self.OQMD_API_URL, params=params, timeout=180,
+                    )
+                except (requests.exceptions.Timeout,
+                        requests.exceptions.ConnectionError) as e:
+                    if attempt < 99:
+                        import time
+                        wait = min(10 * (attempt + 1), 120)
+                        self.logger.warning(
+                            "%s, retrying in %ds (attempt %d/100)",
+                            type(e).__name__, wait, attempt + 1,
+                        )
+                        time.sleep(wait)
+                        session = requests.Session()  # fresh connection
+                        continue
+                    raise
+                if resp.status_code in (502, 503, 504) and attempt < 99:
                     import time
-                    wait = 5 * (attempt + 1)
+                    wait = min(10 * (attempt + 1), 120)
                     self.logger.warning(
-                        "502 Bad Gateway, retrying in %ds (attempt %d/3)",
-                        wait, attempt + 1,
+                        "HTTP %d, retrying in %ds (attempt %d/100)",
+                        resp.status_code, wait, attempt + 1,
                     )
                     time.sleep(wait)
+                    session = requests.Session()  # fresh connection
                     continue
                 break
             resp.raise_for_status()
             page = resp.json()
-            results.extend(page.get("data", []))
+
+            page_data = page.get("data", [])
+            page_keys = list(page.keys())
+            self.logger.debug(
+                "Page response: %d entries, keys=%s", len(page_data), page_keys
+            )
+            results.extend(page_data)
 
             if data_available is None:
-                data_available = page.get("meta", {}).get("data_available", "?")
-                self.logger.info("OQMD reports %s total records", data_available)
+                meta = page.get("meta", {})
+                data_available = meta.get("data_available", "?")
+                self.logger.info(
+                    "OQMD meta: data_available=%s, meta_keys=%s",
+                    data_available, list(meta.keys()),
+                )
 
             self.logger.info(
                 "OQMD progress: %d / %s fetched", len(results), data_available
@@ -205,14 +240,20 @@ class OQMDFetcher:
 
             # Check for next page
             next_url = page.get("next")
+            self.logger.debug(
+                "page.get('next')=%r, page.get('links')=%r",
+                next_url, page.get("links"),
+            )
             if not next_url:
                 links = page.get("links", {})
                 next_url = links.get("next") if isinstance(links, dict) else None
 
             if not next_url:
+                self.logger.info("No next page found — pagination complete")
                 break
 
             params["offset"] += params["limit"]
+            self.logger.info("Advancing to offset=%d", params["offset"])
 
         return results
 
@@ -236,22 +277,11 @@ class OQMDFetcher:
             data = self.cache.load(cache_key)
             return self._deserialize_records(data)
 
-        # Try qmpy_rester first, fall back to HTTP
-        entries = []
-        try:
-            self.logger.info("Fetching OQMD data via qmpy_rester...")
-            entries = self._fetch_via_qmpy()
-            self.logger.info(
-                "qmpy_rester success: %d entries", len(entries)
-            )
-        except Exception as e:
-            self.logger.warning(
-                "qmpy_rester failed (%s), falling back to HTTP", e
-            )
-            entries = self._fetch_via_http()
-            self.logger.info(
-                "HTTP fallback success: %d entries", len(entries)
-            )
+        # Use HTTP with pagination directly — qmpy_rester is unmaintained
+        # and returns only the first page (50 records) without paginating.
+        self.logger.info("Fetching OQMD data via HTTP with pagination...")
+        entries = self._fetch_via_http()
+        self.logger.info("HTTP fetch complete: %d entries", len(entries))
 
         # Convert to MaterialRecord
         records = [self._entry_to_record(entry) for entry in entries]

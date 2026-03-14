@@ -1,12 +1,12 @@
 """CLI orchestrator for fetching and cleaning cathode material data.
 
-Runs all enabled fetchers (Materials Project, OQMD, Battery Data Genome),
+Runs all enabled fetchers (Materials Project, OQMD, AFLOW, JARVIS),
 merges results, applies the cleaning pipeline, and saves processed data
 with a cleaning log.
 
 Usage:
     python -m cathode_ml.data.fetch
-    python -m cathode_ml.data.fetch --config configs/data.yaml --force-refresh
+    python -m cathode_ml.data.fetch --refresh mp aflow jarvis
 """
 
 import argparse
@@ -21,38 +21,27 @@ from cathode_ml.data.clean import CleaningPipeline
 
 logger = logging.getLogger("cathode_ml.data.fetch")
 
+# Canonical source keys used for --refresh and config lookup
+SOURCE_KEYS = ("mp", "oqmd", "aflow", "jarvis")
 
-def main() -> None:
+
+def run_fetch(
+    config_path: str = "configs/data.yaml",
+    refresh_sources: set | None = None,
+) -> None:
     """Run the full data fetching and cleaning pipeline.
 
-    1. Load config and set seeds
-    2. Fetch from each enabled source
-    3. Merge all records
-    4. Run cleaning pipeline
-    5. Save processed data and cleaning log
+    Args:
+        config_path: Path to the data YAML config file.
+        refresh_sources: Set of source keys to force-refresh (``"mp"``,
+            ``"oqmd"``, ``"aflow"``, ``"jarvis"``).  ``None`` or empty
+            means use cache for everything.
     """
-    parser = argparse.ArgumentParser(
-        description="Fetch and clean cathode material data from multiple sources"
-    )
-    parser.add_argument(
-        "--config",
-        default="configs/data.yaml",
-        help="Path to YAML config file (default: configs/data.yaml)",
-    )
-    parser.add_argument(
-        "--force-refresh",
-        action="store_true",
-        help="Bypass cache and re-download all data",
-    )
-    args = parser.parse_args()
+    if refresh_sources is None:
+        refresh_sources = set()
 
-    # Setup
-    config = load_config(args.config)
+    config = load_config(config_path)
     set_seeds(config)
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(name)s - %(levelname)s - %(message)s",
-    )
 
     cache = DataCache(config["cache"]["directory"])
     all_records = []
@@ -65,7 +54,7 @@ def main() -> None:
             from cathode_ml.data.mp_fetcher import MPFetcher
 
             mp = MPFetcher(config, cache)
-            mp_records = mp.fetch(force_refresh=args.force_refresh)
+            mp_records = mp.fetch(force_refresh="mp" in refresh_sources)
             all_records.extend(mp_records)
             logger.info(f"Materials Project: {len(mp_records)} records")
         except ImportError:
@@ -78,7 +67,7 @@ def main() -> None:
             from cathode_ml.data.oqmd_fetcher import OQMDFetcher
 
             oqmd = OQMDFetcher(config, cache)
-            oqmd_records = oqmd.fetch(force_refresh=args.force_refresh)
+            oqmd_records = oqmd.fetch(force_refresh="oqmd" in refresh_sources)
             all_records.extend(oqmd_records)
             logger.info(f"OQMD: {len(oqmd_records)} records")
         except ImportError:
@@ -86,18 +75,31 @@ def main() -> None:
         except Exception as e:
             logger.error(f"OQMD fetch failed: {e}")
 
-    if sources.get("battery_data_genome", {}).get("enabled", False):
+    if sources.get("aflow", {}).get("enabled", False):
         try:
-            from cathode_ml.data.bdg_fetcher import BDGFetcher
+            from cathode_ml.data.aflow_fetcher import AFLOWFetcher
 
-            bdg = BDGFetcher(config, cache)
-            bdg_records = bdg.fetch(force_refresh=args.force_refresh)
-            all_records.extend(bdg_records)
-            logger.info(f"Battery Data Genome: {len(bdg_records)} records")
+            af = AFLOWFetcher(config, cache)
+            af_records = af.fetch(force_refresh="aflow" in refresh_sources)
+            all_records.extend(af_records)
+            logger.info(f"AFLOW: {len(af_records)} records")
         except ImportError:
-            logger.warning("BDGFetcher not available -- skipping BDG")
+            logger.warning("aflow package not installed -- skipping AFLOW")
         except Exception as e:
-            logger.error(f"BDG fetch failed: {e}")
+            logger.error(f"AFLOW fetch failed: {e}")
+
+    if sources.get("jarvis", {}).get("enabled", False):
+        try:
+            from cathode_ml.data.jarvis_fetcher import JARVISFetcher
+
+            jv = JARVISFetcher(config, cache)
+            jv_records = jv.fetch(force_refresh="jarvis" in refresh_sources)
+            all_records.extend(jv_records)
+            logger.info(f"JARVIS: {len(jv_records)} records")
+        except ImportError:
+            logger.warning("jarvis-tools not installed -- skipping JARVIS")
+        except Exception as e:
+            logger.error(f"JARVIS fetch failed: {e}")
 
     logger.info(f"Total records fetched: {len(all_records)}")
 
@@ -118,6 +120,37 @@ def main() -> None:
 
     logger.info(f"Cleaned records: {len(cleaned)}, saved to data/processed/materials.json")
     logger.info(f"Cleaning log: data/logs/cleaning_log.json")
+
+
+def main() -> None:
+    """CLI entry point for standalone data fetching."""
+    parser = argparse.ArgumentParser(
+        description="Fetch and clean cathode material data from multiple sources"
+    )
+    parser.add_argument(
+        "--config",
+        default="configs/data.yaml",
+        help="Path to YAML config file (default: configs/data.yaml)",
+    )
+    parser.add_argument(
+        "--refresh",
+        nargs="+",
+        choices=["all"] + list(SOURCE_KEYS),
+        default=[],
+        metavar="SOURCE",
+        help="Force-refresh specific sources (mp, oqmd, aflow, jarvis, or all)",
+    )
+    args, _ = parser.parse_known_args()
+
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(name)s - %(levelname)s - %(message)s",
+    )
+
+    refresh = set(args.refresh)
+    if "all" in refresh:
+        refresh = set(SOURCE_KEYS)
+    run_fetch(config_path=args.config, refresh_sources=refresh)
 
 
 if __name__ == "__main__":

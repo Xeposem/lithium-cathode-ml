@@ -24,9 +24,15 @@ data_sources:
     element_set: "Li"
     stability_max: 0.1
 
-  battery_data_genome:
+  aflow:
     enabled: true
-    source_url: "https://data.nrel.gov/submissions/bdg"
+    element: "Li"
+    max_entries: 5000
+
+  jarvis:
+    enabled: true
+    dataset: "dft_3d"
+    element: "Li"
 
 filters:
   min_sites: 2

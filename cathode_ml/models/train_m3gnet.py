@@ -11,7 +11,6 @@ Usage:
 
 from __future__ import annotations
 
-import csv
 import json
 import logging
 import random
@@ -29,7 +28,7 @@ from cathode_ml.models.m3gnet import (
     load_m3gnet_model,
     predict_with_m3gnet,
 )
-from cathode_ml.models.utils import compute_metrics, save_results
+from cathode_ml.models.utils import compute_metrics, convert_lightning_logs, save_results
 
 logger = logging.getLogger(__name__)
 
@@ -41,51 +40,6 @@ def _set_seeds(seed: int) -> None:
     torch.manual_seed(seed)
     if torch.cuda.is_available():
         torch.cuda.manual_seed_all(seed)
-
-
-def convert_lightning_logs(log_path: str, output_csv: str) -> None:
-    """Convert Lightning CSVLogger output to project-standard CSV format.
-
-    Lightning may log train and val metrics on separate rows for the same
-    epoch. This function merges them by epoch and renames columns to the
-    project standard: epoch, train_loss, val_loss, val_mae, train_mae.
-
-    Args:
-        log_path: Path to the Lightning metrics.csv file.
-        output_csv: Path to write the standardized CSV.
-    """
-    import pandas as pd
-
-    df = pd.read_csv(log_path)
-
-    # Identify column name mappings (case-insensitive matching)
-    col_map = {}
-    for col in df.columns:
-        col_lower = col.lower()
-        if col_lower == "epoch":
-            col_map[col] = "epoch"
-        elif "train" in col_lower and "loss" in col_lower:
-            col_map[col] = "train_loss"
-        elif "val" in col_lower and "loss" in col_lower:
-            col_map[col] = "val_loss"
-        elif "train" in col_lower and "mae" in col_lower:
-            col_map[col] = "train_mae"
-        elif "val" in col_lower and "mae" in col_lower:
-            col_map[col] = "val_mae"
-
-    df = df.rename(columns=col_map)
-
-    # Group by epoch and aggregate (take first non-NaN for each column)
-    if "epoch" in df.columns:
-        df = df.groupby("epoch", as_index=False).first()
-
-    # Select only standardized columns that exist
-    standard_cols = ["epoch", "train_loss", "val_loss", "val_mae", "train_mae"]
-    out_cols = [c for c in standard_cols if c in df.columns]
-    df = df[out_cols]
-
-    df.to_csv(output_csv, index=False)
-    logger.info("Converted Lightning logs to %s (%d epochs)", output_csv, len(df))
 
 
 def _run_lightning_training(
@@ -176,9 +130,23 @@ def _run_lightning_training(
         num_workers=0,
     )
 
+    # Compute target normalization from training data so the model's
+    # output head works across different property scales (eV/atom, V, mAh/g).
+    import numpy as np
+
+    _targets_arr = np.array(train_targets, dtype=np.float64)
+    data_mean = float(_targets_arr.mean())
+    data_std = float(_targets_arr.std()) or 1.0
+
     # Create Lightning module with include_line_graph=True for M3GNet
     lr = training_cfg.get("learning_rate", 0.001)
-    lit_module = ModelLightningModule(model=model, include_line_graph=True, lr=lr)
+    lit_module = ModelLightningModule(
+        model=model,
+        include_line_graph=True,
+        lr=lr,
+        data_mean=data_mean,
+        data_std=data_std,
+    )
 
     # Configure callbacks
     patience = training_cfg.get("early_stopping_patience", 100)
@@ -235,6 +203,7 @@ def _run_lightning_training(
         convert_lightning_logs(str(lightning_csv), output_csv)
 
     logger.info("Training complete for %s", property_name)
+    return data_mean, data_std
 
 
 def train_m3gnet_for_property(
@@ -278,7 +247,7 @@ def train_m3gnet_for_property(
     model = load_m3gnet_model(model_name)
 
     # Run Lightning training
-    _run_lightning_training(
+    data_mean, data_std = _run_lightning_training(
         model=model,
         train_structures=train_structures,
         train_targets=train_targets,
@@ -289,8 +258,10 @@ def train_m3gnet_for_property(
         seed=seed,
     )
 
-    # Evaluate on test set
-    predictions = predict_with_m3gnet(model, test_structures)
+    # Evaluate on test set — model predicts in normalized space,
+    # so de-normalize: real_value = pred * data_std + data_mean
+    raw_predictions = predict_with_m3gnet(model, test_structures)
+    predictions = [p * data_std + data_mean for p in raw_predictions]
     y_true = np.array(test_targets)
     y_pred = np.array(predictions)
 

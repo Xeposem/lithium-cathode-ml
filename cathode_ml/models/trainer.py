@@ -279,10 +279,11 @@ class GNNTrainer:
             lr: Current learning rate.
         """
         path = Path(csv_path)
-        write_header = not path.exists()
+        write_header = not path.exists() or epoch == 1
         path.parent.mkdir(parents=True, exist_ok=True)
 
-        with open(path, "a", newline="") as f:
+        mode = "w" if write_header else "a"
+        with open(path, mode, newline="") as f:
             writer = csv.writer(f)
             if write_header:
                 writer.writerow(["epoch", "train_loss", "val_loss", "val_mae", "lr"])

@@ -57,7 +57,7 @@ def _render() -> None:
         })
 
     if summary_rows:
-        st.dataframe(summary_rows, use_container_width=True)
+        st.dataframe(summary_rows, width="stretch")
 
     # --- MAE bar comparison ---
     st.subheader("MAE Comparison Across Models")
@@ -65,9 +65,10 @@ def _render() -> None:
     available_props = [p for p in PROPERTIES if p in all_results]
     if available_props:
         fig = make_bar_comparison(all_results, available_props)
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width="stretch")
     else:
         st.info("No property results available for comparison.")
 
 
-_render()
+if not getattr(st, "_is_test_mock", False):
+    _render()

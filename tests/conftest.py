@@ -33,9 +33,15 @@ def sample_config():
                 "element_set": "Li",
                 "stability_max": 0.1,
             },
-            "battery_data_genome": {
+            "aflow": {
                 "enabled": True,
-                "source_url": "https://example.com/bdg",
+                "element": "Li",
+                "max_entries": 5000,
+            },
+            "jarvis": {
+                "enabled": True,
+                "dataset": "dft_3d",
+                "element": "Li",
             },
         },
         "filters": {

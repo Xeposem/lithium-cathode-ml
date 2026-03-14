@@ -8,6 +8,15 @@ Launch: ``streamlit run dashboard/app.py``
 
 from __future__ import annotations
 
+import sys
+from pathlib import Path
+
+# Ensure the project root is on sys.path so that `from dashboard.utils...`
+# imports work regardless of the working directory Streamlit uses.
+_PROJECT_ROOT = str(Path(__file__).resolve().parent.parent)
+if _PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, _PROJECT_ROOT)
+
 import streamlit as st
 
 st.set_page_config(

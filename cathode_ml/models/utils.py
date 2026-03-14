@@ -47,6 +47,72 @@ def compute_metrics(
     }
 
 
+def convert_lightning_logs(log_path: str, output_csv: str) -> None:
+    """Convert Lightning CSVLogger output to project-standard CSV format.
+
+    Lightning logs train and val metrics on **separate rows** for the same
+    epoch.  The train row for epoch *N* actually carries the metrics from
+    epoch *N-1*'s training step (a known CSVLogger lag).  To get correct
+    per-epoch figures we:
+
+    1. Split into val-only and train-only frames.
+    2. Shift train metrics forward by one epoch so they align with the
+       epoch in which training actually occurred.
+    3. Join on epoch.
+
+    The result uses the project standard columns:
+    epoch, train_loss, val_loss, val_mae, train_mae.
+
+    Args:
+        log_path: Path to the Lightning metrics.csv file.
+        output_csv: Path to write the standardized CSV.
+    """
+    import pandas as pd
+
+    df = pd.read_csv(log_path)
+
+    # Identify column name mappings (case-insensitive matching)
+    col_map = {}
+    for col in df.columns:
+        col_lower = col.lower()
+        if col_lower == "epoch":
+            col_map[col] = "epoch"
+        elif "train" in col_lower and "loss" in col_lower:
+            col_map[col] = "train_loss"
+        elif "val" in col_lower and "loss" in col_lower:
+            col_map[col] = "val_loss"
+        elif "train" in col_lower and "mae" in col_lower:
+            col_map[col] = "train_mae"
+        elif "val" in col_lower and "mae" in col_lower:
+            col_map[col] = "val_mae"
+
+    df = df.rename(columns=col_map)
+
+    # Select only standardized columns that exist
+    standard_cols = ["epoch", "train_loss", "val_loss", "val_mae", "train_mae"]
+    out_cols = [c for c in standard_cols if c in df.columns]
+    df = df[out_cols]
+
+    # Split val rows (have val_loss) and train rows (have train_loss)
+    val_cols = [c for c in ["val_loss", "val_mae"] if c in df.columns]
+    train_cols = [c for c in ["train_loss", "train_mae"] if c in df.columns]
+
+    val_df = df.dropna(subset=val_cols[:1])[["epoch"] + val_cols].copy()
+    train_df = df.dropna(subset=train_cols[:1])[["epoch"] + train_cols].copy()
+
+    # Lightning's train row at epoch N holds metrics from epoch N-1.
+    # Shift: assign the train metrics to epoch N+1 so they align correctly.
+    if not train_df.empty:
+        train_df["epoch"] = train_df["epoch"] + 1
+
+    # Join on epoch
+    merged = val_df.merge(train_df, on="epoch", how="left")
+    merged = merged.sort_values("epoch").reset_index(drop=True)
+
+    merged.to_csv(output_csv, index=False)
+    logger.info("Converted Lightning logs to %s (%d epochs)", output_csv, len(merged))
+
+
 def save_results(results: dict, path: str) -> None:
     """Save results dictionary to a JSON file.
 

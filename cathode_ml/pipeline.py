@@ -1,15 +1,17 @@
 """CLI pipeline orchestrator for the full cathode ML workflow.
 
 Orchestrates fetch -> featurize -> train -> evaluate with a single
-command, supporting --skip-fetch, --skip-train, --models, and --seed
-flags. Supports RF, XGBoost, CGCNN, M3GNet, and TensorNet models.
-All heavy imports are lazy (inside stage functions) to keep
+command, supporting --stage, --skip-fetch, --skip-train, --models,
+and --seed flags. Supports RF, XGBoost, CGCNN, M3GNet, and TensorNet
+models. All heavy imports are lazy (inside stage functions) to keep
 ``--help`` fast.
 
 Usage:
-    python -m cathode_ml.pipeline
-    python -m cathode_ml.pipeline --skip-fetch --models rf cgcnn m3gnet
-    python -m cathode_ml.pipeline --skip-train --seed 123
+    python -m cathode_ml --list-stages
+    python -m cathode_ml --stage fetch train
+    python -m cathode_ml --stage train evaluate --models rf cgcnn
+    python -m cathode_ml --skip-fetch --models rf cgcnn m3gnet
+    python -m cathode_ml --skip-train --seed 123
 """
 
 from __future__ import annotations
@@ -19,6 +21,16 @@ import logging
 from pathlib import Path
 
 logger = logging.getLogger("cathode_ml.pipeline")
+
+# Ordered list of (stage_name, description) — canonical stage definitions.
+STAGES = [
+    ("fetch", "Fetch and clean cathode data from all sources"),
+    ("featurize", "Featurize data (currently inline during training)"),
+    ("train", "Train selected models on processed data"),
+    ("evaluate", "Generate comparison tables and plots"),
+]
+
+STAGE_NAMES = [name for name, _ in STAGES]
 
 
 # ---------------------------------------------------------------------------
@@ -36,6 +48,23 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="cathode-ml-pipeline",
         description="Run the full cathode ML pipeline end-to-end",
+    )
+    parser.add_argument(
+        "--list-stages",
+        action="store_true",
+        help="List available pipeline stages and exit",
+    )
+    parser.add_argument(
+        "--stage",
+        nargs="+",
+        choices=STAGE_NAMES,
+        default=None,
+        metavar="STAGE",
+        help=(
+            "Run only these stages (choose from: "
+            + ", ".join(STAGE_NAMES)
+            + "). Default: all stages."
+        ),
     )
     parser.add_argument(
         "--models",
@@ -65,6 +94,14 @@ def build_parser() -> argparse.ArgumentParser:
         default="configs",
         help="Directory containing config YAML files (default: configs)",
     )
+    parser.add_argument(
+        "--refresh",
+        nargs="+",
+        choices=["all", "mp", "oqmd", "aflow", "jarvis"],
+        default=[],
+        metavar="SOURCE",
+        help="Force-refresh specific data sources (mp, oqmd, aflow, jarvis, or all)",
+    )
     return parser
 
 
@@ -75,9 +112,15 @@ def build_parser() -> argparse.ArgumentParser:
 
 def run_fetch_stage(args: argparse.Namespace) -> None:
     """Fetch and clean cathode data from all sources."""
-    from cathode_ml.data.fetch import main as fetch_main  # noqa: C0415
+    from cathode_ml.data.fetch import run_fetch  # noqa: C0415
 
-    fetch_main()
+    refresh = set(args.refresh)
+    if "all" in refresh:
+        refresh = {"mp", "oqmd", "bdg"}
+    run_fetch(
+        config_path=str(Path(args.config_dir) / "data.yaml"),
+        refresh_sources=refresh,
+    )
 
 
 def run_featurize_stage(args: argparse.Namespace) -> None:
@@ -189,20 +232,56 @@ def run_evaluate_stage(args: argparse.Namespace) -> None:
 # ---------------------------------------------------------------------------
 
 
+def _resolve_stages(args: argparse.Namespace) -> list[tuple[str, object, bool]]:
+    """Build the ordered stage list with run/skip flags.
+
+    ``--stage`` takes priority: if provided, only the listed stages run.
+    Otherwise the legacy ``--skip-fetch`` / ``--skip-train`` flags apply.
+    """
+    stage_funcs = {
+        "fetch": ("Fetching Data", run_fetch_stage),
+        "featurize": ("Featurizing", run_featurize_stage),
+        "train": ("Training Models", run_train_stage),
+        "evaluate": ("Evaluating", run_evaluate_stage),
+    }
+
+    selected = set(args.stage) if args.stage else None
+    result: list[tuple[str, object, bool]] = []
+
+    for stage_name in STAGE_NAMES:
+        label, func = stage_funcs[stage_name]
+        if selected is not None:
+            should_run = stage_name in selected
+        else:
+            # Legacy skip flags
+            if stage_name == "fetch":
+                should_run = not args.skip_fetch
+            elif stage_name == "train":
+                should_run = not args.skip_train
+            else:
+                should_run = True
+        result.append((label, func, should_run))
+
+    return result
+
+
+def list_stages() -> None:
+    """Print available pipeline stages to stdout."""
+    print("Available pipeline stages:\n")
+    for i, (name, desc) in enumerate(STAGES, start=1):
+        print(f"  {i}. {name:12s} - {desc}")
+    print(f"\nUsage: python -m cathode_ml --stage {' '.join(STAGE_NAMES[:2])}")
+
+
 def run_pipeline(args: argparse.Namespace) -> None:
-    """Execute the pipeline stages in order, respecting skip flags.
+    """Execute the pipeline stages in order, respecting skip/stage flags.
 
     Args:
         args: Parsed CLI arguments from build_parser().
     """
-    stages: list[tuple[str, object, bool]] = [
-        ("Fetching Data", run_fetch_stage, not args.skip_fetch),
-        ("Featurizing", run_featurize_stage, True),
-        ("Training Models", run_train_stage, not args.skip_train),
-        ("Evaluating", run_evaluate_stage, True),
-    ]
-
+    stages = _resolve_stages(args)
     total = len(stages)
+
     for i, (name, func, should_run) in enumerate(stages, start=1):
         if should_run:
             logger.info("=== Stage %d/%d: %s ===", i, total, name)
@@ -221,6 +300,11 @@ def main() -> None:
     logging.basicConfig(level=logging.INFO, format="%(levelname)s - %(message)s")
     parser = build_parser()
     args = parser.parse_args()
+
+    if args.list_stages:
+        list_stages()
+        return
+
     run_pipeline(args)
 
 

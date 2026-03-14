@@ -168,9 +168,14 @@ class TestConvertLightningLogs:
             assert expected_cols.issubset(set(rows[0].keys())), (
                 f"Missing columns: {expected_cols - set(rows[0].keys())}"
             )
-            assert float(rows[0]["train_loss"]) == pytest.approx(1.5)
+            # Epoch 0: val metrics present, train_loss is empty because
+            # Lightning's train row at epoch 0 is shifted to epoch 1
             assert float(rows[0]["val_loss"]) == pytest.approx(1.3)
             assert float(rows[0]["val_mae"]) == pytest.approx(1.1)
+            assert rows[0]["train_loss"] == ""  # no train data for epoch 0 after shift
+            # Epoch 1: train_loss from epoch 0 shifted here
+            assert float(rows[1]["train_loss"]) == pytest.approx(1.5)
+            assert float(rows[1]["val_loss"]) == pytest.approx(0.9)
             assert float(rows[1]["val_mae"]) == pytest.approx(0.7)
 
 

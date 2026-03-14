@@ -65,6 +65,47 @@ class MPFetcher:
         """Convert MaterialRecord list to serializable dict."""
         return {"records": [asdict(r) for r in records]}
 
+    def _fetch_electrodes_raw(self, api_key: str) -> List[dict]:
+        """Fetch electrode data via raw REST API as a fallback.
+
+        The typed ``InsertionElectrodeDoc`` search can fail with ``'@class'``
+        deserialization errors.  This method pages through the REST endpoint
+        directly and returns plain dicts.
+        """
+        import requests
+
+        base_url = "https://api.materialsproject.org/materials/insertion_electrodes/"
+        headers = {"X-API-KEY": api_key}
+        fields = "battery_id,material_ids,average_voltage,capacity_grav,working_ion"
+        all_docs = []
+        skip = 0
+        limit = 1000
+
+        while True:
+            resp = requests.get(
+                base_url,
+                params={"_fields": fields, "_skip": skip, "_limit": limit},
+                headers=headers,
+                timeout=120,
+            )
+            if not resp.ok:
+                self.logger.warning("Raw electrode API returned %d", resp.status_code)
+                break
+            body = resp.json()
+            data = body.get("data", [])
+            if not data:
+                break
+            all_docs.extend(data)
+            skip += limit
+            self.logger.info("  Fetched %d electrode docs so far...", len(all_docs))
+            # Check if we've gotten all of them
+            total = body.get("meta", {}).get("total_doc", None)
+            if total is not None and len(all_docs) >= total:
+                break
+
+        self.logger.info("Raw REST: fetched %d electrode docs total", len(all_docs))
+        return all_docs
+
     def fetch(self, force_refresh: bool = False) -> List[MaterialRecord]:
         """Fetch lithium cathode materials from Materials Project.
 
@@ -100,25 +141,48 @@ class MPFetcher:
             )
             self.logger.info("Fetched %d material summaries", len(summary_docs))
 
-            # Fetch insertion electrode data
-            electrode_docs = mpr.insertion_electrodes.search(
-                fields=[
-                    "battery_id", "material_ids", "average_voltage",
-                    "capacity_grav", "working_ion", "framework_formula",
-                ],
-            )
-            self.logger.info("Fetched %d electrode docs", len(electrode_docs))
+            # Fetch insertion electrode data.
+            # The typed InsertionElectrodeDoc search can fail with '@class'
+            # deserialization errors in some mp_api versions.  Fall back to
+            # the raw REST API which returns plain dicts.
+            electrode_docs = []
+            try:
+                electrode_docs = mpr.insertion_electrodes.search(
+                    fields=[
+                        "battery_id", "material_ids", "average_voltage",
+                        "capacity_grav", "working_ion", "framework_formula",
+                    ],
+                )
+                self.logger.info("Fetched %d electrode docs", len(electrode_docs))
+            except Exception as e:
+                self.logger.warning(
+                    "Typed electrode fetch failed (%s), trying raw REST API...", e
+                )
+                electrode_docs = self._fetch_electrodes_raw(api_key)
 
         # Filter Li-ion electrodes and build lookup map
         electrode_map = {}
         for edoc in electrode_docs:
-            if edoc.working_ion != "Li":
+            try:
+                if isinstance(edoc, dict):
+                    working_ion = edoc.get("working_ion")
+                    material_ids = edoc.get("material_ids", []) or []
+                    voltage = edoc.get("average_voltage")
+                    capacity = edoc.get("capacity_grav")
+                else:
+                    working_ion = getattr(edoc, "working_ion", None)
+                    material_ids = getattr(edoc, "material_ids", []) or []
+                    voltage = getattr(edoc, "average_voltage", None)
+                    capacity = getattr(edoc, "capacity_grav", None)
+                if working_ion != "Li":
+                    continue
+                for mid in material_ids:
+                    electrode_map[mid] = {
+                        "voltage": voltage,
+                        "capacity": capacity,
+                    }
+            except Exception:
                 continue
-            for mid in edoc.material_ids:
-                electrode_map[mid] = {
-                    "voltage": edoc.average_voltage,
-                    "capacity": edoc.capacity_grav,
-                }
 
         self.logger.info(
             "Built electrode map: %d materials with Li-ion electrode data",

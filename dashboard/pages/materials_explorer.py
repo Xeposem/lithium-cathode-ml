@@ -204,7 +204,7 @@ def _render() -> None:
 
     # ---- Filterable table ----
     display_cols = [c for c in _DISPLAY_COLS if c in filtered.columns]
-    st.dataframe(filtered[display_cols], use_container_width=True)
+    st.dataframe(filtered[display_cols], width="stretch")
 
     # ---- Discovery panel ----
     st.subheader("Top Candidates")
@@ -223,10 +223,11 @@ def _render() -> None:
     rankable = filtered.dropna(subset=[rank_col])
     ranked = rankable.sort_values(rank_col, ascending=ascending).head(top_n)
 
-    st.dataframe(ranked[display_cols], use_container_width=True)
+    st.dataframe(ranked[display_cols], width="stretch")
 
     direction = "lower" if ascending else "higher"
     st.info(f"Materials ranked by {label} ({direction} is better). Showing top {len(ranked)} of {len(rankable)} with data.")
 
 
-_render()
+if not getattr(st, "_is_test_mock", False):
+    _render()

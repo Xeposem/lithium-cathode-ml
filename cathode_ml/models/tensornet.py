@@ -23,7 +23,15 @@ _INSTALL_MSG = (
 
 
 def _import_matgl():
-    """Lazy import of matgl with helpful error message."""
+    """Lazy import of matgl with DGL backend.
+
+    The DGL backend is required because M3GNet (a DGL-only model) may
+    be loaded in the same process.  matgl locks its backend on first
+    import, so every entry point must request DGL *before* importing.
+    """
+    import os
+
+    os.environ.setdefault("MATGL_BACKEND", "dgl")
     try:
         import matgl
     except ImportError:
@@ -101,7 +109,10 @@ def get_tensornet_state_dict(model) -> dict:
     Returns:
         An ``OrderedDict`` of parameter tensors.
     """
-    return model.model.state_dict()
+    # matgl 2.x: TensorNet is a plain nn.Module; older versions
+    # wrapped it in a container with a .model attribute.
+    inner = getattr(model, "model", model)
+    return inner.state_dict()
 
 
 def predict_with_tensornet(model, structures: list) -> List[float]:

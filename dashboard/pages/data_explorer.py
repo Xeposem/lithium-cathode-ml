@@ -106,7 +106,7 @@ def _render() -> None:
 
     # ---- Dataset summary metrics ----
     st.subheader("Dataset Summary")
-    col1, col2, col3, col4 = st.columns(4)
+    col1, col2, col3, col4, col5 = st.columns(5)
     col1.metric("Total Records", len(df))
 
     # Records per source
@@ -114,7 +114,8 @@ def _render() -> None:
         src_counts = df["source"].value_counts()
         col2.metric("MP", src_counts.get("materials_project", 0))
         col3.metric("OQMD", src_counts.get("oqmd", 0))
-        col4.metric("BDG", src_counts.get("battery_data_genome", 0))
+        col4.metric("AFLOW", src_counts.get("aflow", 0))
+        col5.metric("JARVIS", src_counts.get("jarvis", 0))
 
     # Count available properties
     available_props = [p for p in PROPERTIES if p in df.columns and df[p].notna().any()]
@@ -130,7 +131,7 @@ def _render() -> None:
                 prop = available_props[idx]
                 with col:
                     fig = _make_histogram(df, prop)
-                    st.plotly_chart(fig, use_container_width=True)
+                    st.plotly_chart(fig, width="stretch")
 
     # ---- Scatter matrix ----
     st.subheader("Property Correlations")
@@ -143,9 +144,10 @@ def _render() -> None:
     )
     if len(selected) >= 2:
         fig = _make_scatter_matrix(df, selected)
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width="stretch")
     elif selected:
         st.info("Select at least 2 properties for the scatter matrix.")
 
 
-_render()
+if not getattr(st, "_is_test_mock", False):
+    _render()
