@@ -116,7 +116,7 @@ def run_fetch_stage(args: argparse.Namespace) -> None:
 
     refresh = set(args.refresh)
     if "all" in refresh:
-        refresh = {"mp", "oqmd", "bdg"}
+        refresh = {"mp", "oqmd", "aflow", "jarvis"}
     run_fetch(
         config_path=str(Path(args.config_dir) / "data.yaml"),
         refresh_sources=refresh,
