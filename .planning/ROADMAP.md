@@ -40,10 +40,10 @@
   1. Running predict_structure() for M3GNet/TensorNet returns values in the correct physical range (no double-denormalization)
   2. M3GNet and TensorNet achieve positive R-squared on formation energy (comparable to CGCNN baseline range)
   3. TensorNet training log output shows one entry per epoch with no duplicated lines
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 10-01: TBD
+- [ ] 10-01-PLAN.md — Fix double-denormalization bug and TensorNet log duplication
 
 ### Phase 11: Data Validation & Retraining
 **Goal**: All 4 data sources feed validated data into the pipeline, and all models are retrained on the combined dataset with updated metrics
@@ -82,9 +82,9 @@ Phases execute in numeric order: 10 -> 11 -> 12
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 10. Model Bug Fixes | v1.1 | 0/? | Not started | - |
+| 10. Model Bug Fixes | v1.1 | 0/1 | In progress | - |
 | 11. Data Validation & Retraining | v1.1 | 0/? | Not started | - |
 | 12. Project Surfaces | v1.1 | 0/? | Not started | - |
 
 ---
-*Last updated: 2026-03-13 after v1.1 roadmap creation*
+*Last updated: 2026-03-13 after phase 10 planning*
