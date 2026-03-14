@@ -43,7 +43,7 @@
 **Plans**: 1 plan
 
 Plans:
-- [ ] 10-01-PLAN.md — Fix double-denormalization bug and TensorNet log duplication
+- [x] 10-01-PLAN.md — Fix double-denormalization bug and TensorNet log duplication
 
 ### Phase 11: Data Validation & Retraining
 **Goal**: All 4 data sources feed validated data into the pipeline, and all models are retrained on the combined dataset with updated metrics
@@ -54,11 +54,11 @@ Plans:
   2. JARVIS fetcher retrieves lithium cathode records and they pass through clean and graph conversion without errors
   3. Combined 4-source dataset is larger than the previous 2-source dataset
   4. All models (CGCNN, M3GNet, TensorNet, RF, XGBoost) have fresh metrics on the 4-source dataset stored in results
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 11-01: TBD
-- [ ] 11-02: TBD
+- [ ] 11-01-PLAN.md — Validate AFLOW/JARVIS end-to-end through pipeline and fix refresh bug
+- [ ] 11-02-PLAN.md — Retrain all models on 4-source combined dataset
 
 ### Phase 12: Project Surfaces
 **Goal**: Every public-facing artifact accurately reflects the current state of the project with corrected results, all 4 data sources, and current architecture
@@ -83,8 +83,8 @@ Phases execute in numeric order: 10 -> 11 -> 12
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 10. Model Bug Fixes | 1/1 | Complete    | 2026-03-14 | - |
-| 11. Data Validation & Retraining | v1.1 | 0/? | Not started | - |
+| 11. Data Validation & Retraining | v1.1 | 0/2 | Not started | - |
 | 12. Project Surfaces | v1.1 | 0/? | Not started | - |
 
 ---
-*Last updated: 2026-03-13 after phase 10 planning*
+*Last updated: 2026-03-14 after phase 11 planning*
