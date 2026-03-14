@@ -27,10 +27,18 @@ Accurate, reproducible prediction of cathode performance properties from crystal
 
 ### Active
 
-- [ ] Fix M3GNet/TensorNet double-denormalization bug (predict_structure already denormalizes)
-- [ ] Fix TensorNet training log duplication error
-- [ ] AFLOW and JARVIS data source integration (fetchers exist, need validation)
-- [ ] Retrain all models with 4-source combined data
+#### Current Milestone: v1.1 Polish & Correctness
+
+**Goal:** Fix known bugs, validate all data sources, retrain models, and update all project surfaces to reflect accurate state.
+
+**Target features:**
+- Fix M3GNet/TensorNet double-denormalization bug
+- Fix TensorNet training log duplication error
+- Validate AFLOW and JARVIS fetchers end-to-end
+- Retrain all models with 4-source combined data
+- Update README with accurate results, all 4 data sources, current architecture
+- Update GitHub repo description/topics
+- Update dashboard with corrected model results, AFLOW/JARVIS data, accurate displays
 
 ### Out of Scope
 
@@ -70,4 +78,4 @@ Accurate, reproducible prediction of cathode performance properties from crystal
 | scipy KDTree for neighbors | Workaround for pymatgen Cython dtype bug on Windows | ✓ Good |
 
 ---
-*Last updated: 2026-03-13 after v1.0 milestone*
+*Last updated: 2026-03-13 after v1.1 milestone start*

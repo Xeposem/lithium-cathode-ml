@@ -1,15 +1,15 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.0
-milestone_name: MVP
+milestone: v1.1
+milestone_name: Polish & Correctness
 current_plan: null
-status: milestone_complete
+status: defining_requirements
 last_updated: "2026-03-13"
 progress:
-  total_phases: 9
-  completed_phases: 9
-  total_plans: 23
-  completed_plans: 23
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
 ---
 
 # Project State
@@ -19,11 +19,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-13)
 
 **Core value:** Accurate, reproducible prediction of cathode performance properties from crystal structure, with clear model comparison and publication-quality results
-**Current focus:** Planning next milestone
+**Current focus:** Defining requirements for v1.1
 
-## Progress
+## Current Position
 
-v1.0 MVP — Complete (9 phases, 23 plans)
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-03-13 — Milestone v1.1 started
 
 ## Accumulated Context
 
@@ -38,4 +41,4 @@ None
 
 ---
 *Last updated: 2026-03-13*
-*Last session: Completed v1.0 milestone archival*
+*Last session: Started v1.1 milestone*
