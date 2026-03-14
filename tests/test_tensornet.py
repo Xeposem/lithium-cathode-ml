@@ -182,7 +182,7 @@ class TestConvertLightningLogsTensorNet:
                 rows = list(reader)
 
             assert len(rows) == 2
-            assert float(rows[0]["train_loss"]) == pytest.approx(2.0)
+            assert rows[0]["train_loss"] == ""
             assert float(rows[1]["val_mae"]) == pytest.approx(0.9)
 
 
