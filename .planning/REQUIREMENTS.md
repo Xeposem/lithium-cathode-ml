@@ -9,8 +9,8 @@ Requirements for polish & correctness release. Each maps to roadmap phases.
 
 ### Bug Fixes
 
-- [ ] **FIX-01**: M3GNet/TensorNet double-denormalization bug is fixed -- models produce valid R-squared on all properties
-- [ ] **FIX-02**: TensorNet training runs without log duplication errors
+- [x] **FIX-01**: M3GNet/TensorNet double-denormalization bug is fixed -- models produce valid R-squared on all properties
+- [x] **FIX-02**: TensorNet training runs without log duplication errors
 
 ### Data Validation
 
@@ -41,8 +41,8 @@ None -- v1.1 is a polish milestone.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| FIX-01 | Phase 10 | Pending |
-| FIX-02 | Phase 10 | Pending |
+| FIX-01 | Phase 10 | Complete |
+| FIX-02 | Phase 10 | Complete |
 | DATA-01 | Phase 11 | Pending |
 | DATA-02 | Phase 11 | Pending |
 | DATA-03 | Phase 11 | Pending |
