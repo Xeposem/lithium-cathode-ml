@@ -9,13 +9,13 @@ Requirements for polish & correctness release. Each maps to roadmap phases.
 
 ### Bug Fixes
 
-- [ ] **FIX-01**: M3GNet/TensorNet double-denormalization bug is fixed — models produce valid R² on all properties
+- [ ] **FIX-01**: M3GNet/TensorNet double-denormalization bug is fixed -- models produce valid R-squared on all properties
 - [ ] **FIX-02**: TensorNet training runs without log duplication errors
 
 ### Data Validation
 
-- [ ] **DATA-01**: AFLOW fetcher validated end-to-end through the pipeline (fetch → clean → graph)
-- [ ] **DATA-02**: JARVIS fetcher validated end-to-end through the pipeline (fetch → clean → graph)
+- [ ] **DATA-01**: AFLOW fetcher validated end-to-end through the pipeline (fetch -> clean -> graph)
+- [ ] **DATA-02**: JARVIS fetcher validated end-to-end through the pipeline (fetch -> clean -> graph)
 - [ ] **DATA-03**: All models retrained with 4-source combined dataset, metrics updated
 
 ### Project Surfaces
@@ -26,7 +26,7 @@ Requirements for polish & correctness release. Each maps to roadmap phases.
 
 ## Future Requirements
 
-None — v1.1 is a polish milestone.
+None -- v1.1 is a polish milestone.
 
 ## Out of Scope
 
@@ -39,24 +39,22 @@ None — v1.1 is a polish milestone.
 
 ## Traceability
 
-Which phases cover which requirements. Updated during roadmap creation.
-
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| FIX-01 | — | Pending |
-| FIX-02 | — | Pending |
-| DATA-01 | — | Pending |
-| DATA-02 | — | Pending |
-| DATA-03 | — | Pending |
-| SURF-01 | — | Pending |
-| SURF-02 | — | Pending |
-| SURF-03 | — | Pending |
+| FIX-01 | Phase 10 | Pending |
+| FIX-02 | Phase 10 | Pending |
+| DATA-01 | Phase 11 | Pending |
+| DATA-02 | Phase 11 | Pending |
+| DATA-03 | Phase 11 | Pending |
+| SURF-01 | Phase 12 | Pending |
+| SURF-02 | Phase 12 | Pending |
+| SURF-03 | Phase 12 | Pending |
 
 **Coverage:**
 - v1.1 requirements: 8 total
-- Mapped to phases: 0
-- Unmapped: 8 ⚠️
+- Mapped to phases: 8
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-13*
-*Last updated: 2026-03-13 after initial definition*
+*Last updated: 2026-03-13 after roadmap creation*
