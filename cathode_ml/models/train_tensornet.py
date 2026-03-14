@@ -249,7 +249,7 @@ def train_tensornet_for_property(
     model = build_tensornet_from_config(tensornet_config["model"], element_types)
 
     # Run Lightning training
-    data_mean, data_std = _run_lightning_training(
+    _run_lightning_training(
         model=model,
         train_structures=train_structures,
         train_targets=train_targets,
@@ -260,10 +260,9 @@ def train_tensornet_for_property(
         seed=seed,
     )
 
-    # Evaluate on test set — model predicts in normalized space,
-    # so de-normalize: real_value = pred * data_std + data_mean
-    raw_predictions = predict_with_tensornet(model, test_structures)
-    predictions = [p * data_std + data_mean for p in raw_predictions]
+    # Evaluate on test set -- predict_structure() already returns
+    # denormalized values; ModelLightningModule handles normalization internally
+    predictions = predict_with_tensornet(model, test_structures)
     y_true = np.array(test_targets)
     y_pred = np.array(predictions)
 
