@@ -42,6 +42,9 @@ coverage.xml
 # Jupyter
 .ipynb_checkpoints/
 
+# DGL/MatGL cache
+MGLDataset/
+
 # OS
 .DS_Store
 Thumbs.db
