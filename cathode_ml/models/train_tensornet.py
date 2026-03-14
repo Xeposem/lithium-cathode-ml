@@ -178,8 +178,12 @@ def _run_lightning_training(
         accelerator=_accel,
         logger=csv_logger,
         callbacks=[checkpoint_callback, early_stop_callback],
-        enable_progress_bar=True,
+        enable_progress_bar=False,
+        enable_model_summary=False,
     )
+
+    # Prevent Lightning from adding duplicate console handlers
+    logging.getLogger("lightning.pytorch").setLevel(logging.WARNING)
 
     # Train
     _set_seeds(seed)
