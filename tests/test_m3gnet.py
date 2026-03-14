@@ -457,3 +457,64 @@ class TestM3GNetArtifactFormat:
         for prop, prop_data in results.items():
             assert "m3gnet" in prop_data
             assert "megnet" not in prop_data
+
+
+class TestNoDenormalization:
+    """Verify predict_with_m3gnet output is used directly without rescaling."""
+
+    def test_predictions_not_double_denormalized(self):
+        """compute_metrics receives raw predict_with_m3gnet values, not rescaled ones.
+
+        If double-denormalization bug is present, compute_metrics would receive
+        [1.5*3+2=6.5, 2.3*3+2=8.9, 0.8*3+2=4.4] instead of [1.5, 2.3, 0.8].
+        """
+        from cathode_ml.models.train_m3gnet import train_m3gnet_for_property
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            mock_model = MagicMock()
+            mock_model.cutoff = 5.0
+            mock_model.model.state_dict.return_value = {"weight": "fake"}
+
+            m3gnet_config = {
+                "model": {"pretrained_model": "M3GNet-MP-2018.6.1-Eform"},
+                "training": {
+                    "learning_rate": 0.0001, "batch_size": 2, "n_epochs": 2,
+                    "early_stopping_patience": 5,
+                },
+                "results_dir": tmpdir,
+            }
+
+            mock_structures = [MagicMock() for _ in range(10)]
+            mock_targets = [float(i) * 0.1 for i in range(10)]
+
+            # predict_with_m3gnet returns already-denormalized values
+            raw_preds = [1.5, 2.3, 0.8]
+
+            # _run_lightning_training returns data_mean=2.0, data_std=3.0
+            # If bug exists, code would rescale: p*3+2 giving [6.5, 8.9, 4.4]
+            captured_args = {}
+
+            def capture_compute_metrics(y_true, y_pred, n_train):
+                captured_args["y_pred"] = y_pred.tolist()
+                return {"mae": 0.1, "rmse": 0.15, "r2": 0.9, "n_train": n_train, "n_test": len(y_pred)}
+
+            with patch("cathode_ml.models.train_m3gnet.load_m3gnet_model", return_value=mock_model), \
+                 patch("cathode_ml.models.train_m3gnet.predict_with_m3gnet", return_value=raw_preds), \
+                 patch("cathode_ml.models.train_m3gnet.compute_metrics", side_effect=capture_compute_metrics), \
+                 patch("cathode_ml.models.train_m3gnet._run_lightning_training", return_value=(2.0, 3.0)):
+                train_m3gnet_for_property(
+                    structures=mock_structures,
+                    targets=mock_targets,
+                    train_idx=[0, 1, 2, 3, 4, 5, 6],
+                    val_idx=[7, 8],
+                    test_idx=[9],
+                    property_name="formation_energy_per_atom",
+                    m3gnet_config=m3gnet_config,
+                    seed=42,
+                )
+
+            # y_pred should be the raw predictions, NOT rescaled
+            assert captured_args["y_pred"] == pytest.approx(raw_preds), (
+                f"Expected raw predictions {raw_preds}, got {captured_args['y_pred']}. "
+                "Double-denormalization bug is present."
+            )
