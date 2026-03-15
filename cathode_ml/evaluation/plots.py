@@ -138,7 +138,11 @@ def plot_parity(
 
 
 def plot_bar_comparison(all_results: dict, output_path: str) -> None:
-    """Generate grouped bar chart comparing MAE across models and properties.
+    """Generate per-property bar charts comparing MAE across models.
+
+    Uses separate subplots per property so each has its own y-axis scale,
+    avoiding the problem of capacity MAE (~50) dwarfing formation energy
+    MAE (~0.03).
 
     Args:
         all_results: Unified results dict from load_all_results().
@@ -163,34 +167,65 @@ def plot_bar_comparison(all_results: dict, output_path: str) -> None:
 
     n_props = len(props_with_data)
     n_models = len(models_present)
-    bar_width = 0.8 / max(n_models, 1)
 
-    fig, ax = plt.subplots(figsize=(8, 4))
-    x = np.arange(n_props)
+    # Property units for axis labels
+    prop_units = {
+        "voltage": "V",
+        "capacity": "mAh/g",
+        "formation_energy_per_atom": "eV/atom",
+        "energy_above_hull": "eV/atom",
+    }
 
-    for i, model_key in enumerate(models_present):
+    fig, axes = plt.subplots(1, n_props, figsize=(3 * n_props, 4))
+    if n_props == 1:
+        axes = [axes]
+
+    for ax_idx, prop in enumerate(props_with_data):
+        ax = axes[ax_idx]
+        prop_results = all_results.get(prop, {})
+
+        # Only plot models that have reasonable results (exclude wildly negative R2)
+        models_for_prop = []
         mae_values = []
-        for prop in props_with_data:
-            if model_key in all_results.get(prop, {}):
-                mae_values.append(all_results[prop][model_key]["mae"])
-            else:
-                mae_values.append(0)
+        colors = []
+        for m in models_present:
+            if m in prop_results:
+                r2 = prop_results[m].get("r2", 0)
+                # Skip models with extremely poor fits (R2 < -1)
+                if r2 < -1:
+                    continue
+                models_for_prop.append(m)
+                mae_values.append(prop_results[m]["mae"])
+                colors.append(MODEL_COLORS[m])
 
-        offset = (i - n_models / 2 + 0.5) * bar_width
-        ax.bar(
-            x + offset,
-            mae_values,
-            bar_width,
-            label=MODEL_LABELS[model_key],
-            color=MODEL_COLORS[model_key],
+        if not models_for_prop:
+            ax.text(0.5, 0.5, "No data", ha="center", va="center", transform=ax.transAxes)
+            ax.set_title(_property_display_name(prop))
+            continue
+
+        x = np.arange(len(models_for_prop))
+        bars = ax.bar(x, mae_values, color=colors, width=0.6)
+
+        # Add value labels on bars
+        for bar, val in zip(bars, mae_values):
+            ax.text(
+                bar.get_x() + bar.get_width() / 2,
+                bar.get_height(),
+                f"{val:.3f}" if val < 1 else f"{val:.1f}",
+                ha="center", va="bottom", fontsize=6,
+            )
+
+        ax.set_xticks(x)
+        ax.set_xticklabels(
+            [MODEL_LABELS[m] for m in models_for_prop],
+            rotation=45, ha="right", fontsize=7,
         )
+        unit = prop_units.get(prop, "")
+        ax.set_ylabel(f"MAE ({unit})" if unit else "MAE")
+        ax.set_title(_property_display_name(prop))
 
-    ax.set_xticks(x)
-    ax.set_xticklabels([_property_display_name(p) for p in props_with_data], rotation=30, ha="right")
-    ax.set_ylabel("MAE")
-    ax.legend(frameon=False)
-
-    fig.tight_layout()
+    fig.suptitle("Model Comparison (MAE, lower is better)", fontsize=10)
+    fig.tight_layout(rect=[0, 0, 1, 0.94])
     Path(output_path).parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(output_path)
     plt.close(fig)
