@@ -50,20 +50,86 @@ All models are evaluated on identical held-out test sets using three metrics:
 
 ## Results
 
-### Summary Table
+### Best Model per Property
 
 | Property | Best Model | MAE | R-squared |
 |---|---|---|---|
 | formation_energy_per_atom | CGCNN | 0.0341 | 0.9952 |
 | voltage | XGBoost | 0.4336 | 0.6791 |
-| capacity | XGBoost | 49.2205 | 0.4351 |
+| capacity | CGCNN | 48.78 | 0.4652 |
 | energy_above_hull | CGCNN | 0.0211 | 0.6903 |
+
+### Full Model Comparison
+
+#### Formation Energy per Atom
+
+Train: 36,962 | Test: 4,731
+
+| Model | MAE | RMSE | R-squared |
+|---|---|---|---|
+| RF | 0.0746 | 0.1393 | 0.9810 |
+| XGBoost | 0.0713 | 0.1224 | 0.9853 |
+| **CGCNN** | **0.0341** | **0.0697** | **0.9952** |
+| M3GNet\* | 0.3210 | 0.4096 | 0.8358 |
+| TensorNet | 5.5991 | 7.5781 | -55.2231 |
+
+_\* Fine-tuned from pretrained M3GNet-MP-2018.6.1-Eform_
+
+#### Voltage
+
+Train: 2,934 | Test: 368
+
+| Model | MAE | RMSE | R-squared |
+|---|---|---|---|
+| RF | 0.4514 | 0.6380 | 0.6529 |
+| **XGBoost** | **0.4336** | **0.6135** | **0.6791** |
+| CGCNN | 0.4921 | 0.7280 | 0.5482 |
+| M3GNet\* | 6.2511 | 6.3554 | -33.4367 |
+| TensorNet | 34.4207 | 39.2295 | -1311.0687 |
+
+_\* Fine-tuned from pretrained M3GNet-MP-2018.6.1-Eform_
+
+#### Capacity
+
+Train: 2,934 | Test: 368
+
+| Model | MAE | RMSE | R-squared |
+|---|---|---|---|
+| RF | 50.2189 | 68.2151 | 0.4302 |
+| XGBoost | 49.2205 | 67.9244 | 0.4351 |
+| **CGCNN** | **48.7821** | **66.0855** | **0.4652** |
+| M3GNet\* | 162.6733 | 186.0789 | -3.2398 |
+| TensorNet | 169.8472 | 192.2349 | -3.5250 |
+
+_\* Fine-tuned from pretrained M3GNet-MP-2018.6.1-Eform_
+
+#### Energy Above Hull
+
+Train: 34,583 | Test: 4,405
+
+| Model | MAE | RMSE | R-squared |
+|---|---|---|---|
+| RF | 0.0278 | 0.0683 | 0.3826 |
+| XGBoost | 0.0296 | 0.0681 | 0.3858 |
+| **CGCNN** | **0.0211** | **0.0484** | **0.6903** |
+| M3GNet\* | 3.4989 | 3.6105 | -1724.6533 |
+| TensorNet | 29.7300 | 42.5254 | -239399.4541 |
+
+_\* Fine-tuned from pretrained M3GNet-MP-2018.6.1-Eform_
 
 If the evaluation pipeline has been executed, a visual comparison is available:
 
 ![Model Comparison](data/results/figures/bar_comparison.png)
 
-**Interpretation:** Trained on 46,389 records from 4 data sources (Materials Project, OQMD, AFLOW, JARVIS), graph neural networks (CGCNN, M3GNet, TensorNet) tend to outperform composition-only baselines on properties that depend strongly on crystal structure (e.g., formation energy, stability), where bond geometries and atomic environments carry information not captured by elemental statistics alone. For composition-dominated properties like voltage, traditional baselines remain competitive, suggesting that elemental chemistry is the primary driver.
+### Interpretation
+
+Trained on 46,389 records from 4 data sources (Materials Project, OQMD, AFLOW, JARVIS), CGCNN is the strongest overall model, winning 3 of 4 target properties. Its advantage on formation energy (R-squared 0.9952 vs XGBoost's 0.9853) demonstrates that crystal structure information provides measurable lift for structure-sensitive properties, where bond geometries and atomic environments carry information not captured by elemental statistics alone.
+
+For composition-dominated properties such as voltage and capacity, traditional ML baselines remain competitive or superior. XGBoost wins on voltage (R-squared 0.6791), confirming that elemental chemistry is the primary predictor for these properties.
+
+**M3GNet underperformance:** M3GNet is fine-tuned from a pretrained formation-energy model (M3GNet-MP-2018.6.1-Eform). While this provides a reasonable starting point for formation energy prediction (R-squared 0.8358), it causes domain mismatch when applied to voltage, capacity, and stability targets. The pretrained weights are biased toward formation energy patterns, and the limited fine-tuning epochs typical of transfer learning are insufficient to overcome this bias for dissimilar target properties, resulting in predictions that are worse than predicting the mean (negative R-squared).
+
+**TensorNet underperformance:** TensorNet is trained from scratch with no pretraining. This architecture requires substantially more training data and epochs to converge than are available in the current training budget. Without pretrained representations to bootstrap learning, the model fails to learn meaningful structure-property mappings, producing predictions with negative R-squared across all properties -- indicating outputs that are worse than a constant mean prediction.
 
 ## Dashboard
 

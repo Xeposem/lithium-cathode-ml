@@ -7,9 +7,10 @@ via median imputation and drops all-NaN columns.
 
 from __future__ import annotations
 
+import warnings
+
 import numpy as np
 import pandas as pd
-from matminer.featurizers.composition import ElementProperty
 from pymatgen.core import Composition
 
 
@@ -35,11 +36,16 @@ def featurize_compositions(
     df["composition"] = df["formula"].apply(Composition)
 
     # Featurize using Magpie preset (132 descriptors)
+    # Suppress tqdm deprecation warnings from matminer internals
+    from matminer.featurizers.composition import ElementProperty
+
     featurizer = ElementProperty.from_preset("magpie")
     featurizer.set_n_jobs(1)
-    df = featurizer.featurize_dataframe(
-        df, col_id="composition", ignore_errors=True, pbar=False
-    )
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore", category=DeprecationWarning)
+        df = featurizer.featurize_dataframe(
+            df, col_id="composition", ignore_errors=True, pbar=False
+        )
 
     # Extract feature columns
     feature_labels = featurizer.feature_labels()
