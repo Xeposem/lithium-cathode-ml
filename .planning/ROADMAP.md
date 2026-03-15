@@ -69,11 +69,11 @@ Plans:
   2. GitHub repo description and topics include references to all data sources and model types
   3. Streamlit dashboard displays corrected metrics for all models, shows AFLOW/JARVIS data in the explorer, and all charts render without errors
   4. No stale v1.0 metrics or 2-source-only references remain in any public surface
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 12-01: TBD
-- [ ] 12-02: TBD
+- [ ] 12-01-PLAN.md — Update README and GitHub repo metadata with corrected content
+- [ ] 12-02-PLAN.md — Regenerate comparison files with all 5 models and verify dashboard
 
 ## Progress
 
@@ -84,7 +84,7 @@ Phases execute in numeric order: 10 -> 11 -> 12
 |-------|-----------|----------------|--------|-----------|
 | 10. Model Bug Fixes | 1/1 | Complete    | 2026-03-14 | - |
 | 11. Data Validation & Retraining | 2/2 | Complete    | 2026-03-15 | - |
-| 12. Project Surfaces | v1.1 | 0/? | Not started | - |
+| 12. Project Surfaces | v1.1 | 0/2 | Not started | - |
 
 ---
-*Last updated: 2026-03-15 after 11-02 completion*
+*Last updated: 2026-03-14 after phase 12 planning*
