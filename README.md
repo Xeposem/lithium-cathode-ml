@@ -117,9 +117,7 @@ Train: 34,583 | Test: 4,405
 
 _\* Fine-tuned from pretrained M3GNet-MP-2018.6.1-Eform_
 
-If the evaluation pipeline has been executed, a visual comparison is available:
-
-![Model Comparison](data/results/figures/bar_comparison.png)
+![Model Comparison](docs/figures/bar_comparison.png)
 
 ### Interpretation
 
@@ -154,7 +152,7 @@ streamlit run dashboard/app.py
 
 ### Prerequisites
 
-- Python 3.9+
+- Python 3.11+
 - conda or pip (conda recommended for PyTorch/PyG dependencies)
 
 ### Installation
@@ -283,10 +281,16 @@ lithium-cathode-ml/
 │   └── tensornet.yaml
 ├── data/                        # Data directory (gitignored contents)
 │   └── results/                 # Model outputs, metrics, figures
+├── docs/                        # Documentation assets
+│   └── figures/                 # Generated plots and charts
+│       └── bar_comparison.png   # Model comparison bar chart
 ├── tests/                       # Test suite
 │   ├── conftest.py              # Shared fixtures
 │   ├── test_*.py                # Unit tests per module
 │   └── ...
+├── .env.example                 # Example environment variables
+├── environment.yml              # Conda environment specification
+├── pyproject.toml               # Project metadata and build config
 └── requirements.txt             # Pinned dependencies
 ```
 
