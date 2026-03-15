@@ -9,7 +9,34 @@ Launch: ``streamlit run dashboard/app.py``
 from __future__ import annotations
 
 import sys
+import warnings
 from pathlib import Path
+
+# Suppress cosmetic warnings that appear during normal dashboard use.
+# pymatgen: noble gases (Ar, He, Ne) have no Pauling electronegativity.
+warnings.filterwarnings(
+    "ignore",
+    message=".*No Pauling electronegativity.*",
+    category=UserWarning,
+)
+# matminer: MagpieData impute_nan default change notice.
+warnings.filterwarnings(
+    "ignore",
+    message=".*impute_nan.*",
+    category=UserWarning,
+)
+# matminer: general featurizer warnings.
+warnings.filterwarnings(
+    "ignore",
+    category=UserWarning,
+    module="matminer",
+)
+# pymatgen: general structure/composition warnings.
+warnings.filterwarnings(
+    "ignore",
+    category=UserWarning,
+    module="pymatgen",
+)
 
 # Ensure the project root is on sys.path so that `from dashboard.utils...`
 # imports work regardless of the working directory Streamlit uses.

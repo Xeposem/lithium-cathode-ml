@@ -83,7 +83,7 @@ def _render() -> None:
             if df is not None:
                 fig = make_training_curves(df, model, selected_prop)
                 if fig is not None:
-                    st.plotly_chart(fig, use_container_width=True)
+                    st.plotly_chart(fig, width="stretch")
             else:
                 prop_title = selected_prop.replace("_", " ").title()
                 model_label = MODEL_LABELS.get(model, model)

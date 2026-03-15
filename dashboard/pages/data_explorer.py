@@ -131,7 +131,7 @@ def _render() -> None:
                 prop = available_props[idx]
                 with col:
                     fig = _make_histogram(df, prop)
-                    st.plotly_chart(fig, use_container_width=True)
+                    st.plotly_chart(fig, width="stretch")
 
     # ---- Scatter matrix ----
     st.subheader("Property Correlations")
@@ -144,7 +144,7 @@ def _render() -> None:
     )
     if len(selected) >= 2:
         fig = _make_scatter_matrix(df, selected)
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width="stretch")
     elif selected:
         st.info("Select at least 2 properties for the scatter matrix.")
 

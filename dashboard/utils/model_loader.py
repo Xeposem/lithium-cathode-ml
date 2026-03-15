@@ -212,18 +212,25 @@ def load_gnn_model(
                 element_types = checkpoint["element_types"]
                 state_dict = checkpoint.get("model_state_dict", checkpoint)
             else:
-                # Raw state_dict -- use a broad element list for cathode materials
-                element_types = [
-                    "Li", "Na", "K", "Fe", "Co", "Ni", "Mn",
-                    "V", "Ti", "Cr", "Cu", "Zn", "Al", "Mg",
-                    "O", "S", "P", "F", "N", "C", "Si", "B",
-                ]
+                # Raw state_dict saved by get_tensornet_state_dict().
+                # Infer the number of element types from the embedding weight
+                # shape (tensor_embedding.emb.weight: [n_elements, units]).
+                # Reconstruct element list as the first N elements by atomic
+                # number, which matches the ordering used during training.
                 state_dict = checkpoint
+                emb_key = "tensor_embedding.emb.weight"
+                if emb_key in state_dict:
+                    n_elements = state_dict[emb_key].shape[0]
+                else:
+                    n_elements = 89  # safe upper bound for cathode materials
+                from pymatgen.core import Element as _Element
+                element_types = [e.symbol for e in _Element][:n_elements]
             model = build_tensornet_from_config(
                 tensornet_config["model"], element_types
             )
-            model.model.load_state_dict(state_dict)
-            model.model.eval()
+            # TensorNet is a plain nn.Module in matgl 2.x (no .model wrapper).
+            model.load_state_dict(state_dict)
+            model.eval()
             logger.info("Loaded TensorNet model for %s", property_name)
             return model
         except Exception as exc:
