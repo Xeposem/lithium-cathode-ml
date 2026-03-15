@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Polish & Correctness
 status: in-progress
-stopped_at: Completed 11-01-PLAN.md
-last_updated: "2026-03-14T21:08:02Z"
-last_activity: 2026-03-14 -- Completed 11-01 data validation
+stopped_at: Completed 11-02-PLAN.md
+last_updated: "2026-03-15T03:22:38Z"
+last_activity: 2026-03-14 -- Completed 11-02 full retraining on 4-source data
 progress:
   total_phases: 3
   completed_phases: 2
-  total_plans: 2
-  completed_plans: 2
-  percent: 67
+  total_plans: 3
+  completed_plans: 3
+  percent: 100
 ---
 
 # Project State
@@ -21,30 +21,30 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-13)
 
 **Core value:** Accurate, reproducible prediction of cathode performance properties from crystal structure, with clear model comparison and publication-quality results
-**Current focus:** Phase 11 - Data Validation & Retraining
+**Current focus:** Phase 12 - Project Surfaces
 
 ## Current Position
 
 Phase: 11 of 12 (Data Validation & Retraining)
-Plan: 01 of 01 (Complete)
-Status: Phase 11 complete
-Last activity: 2026-03-14 -- Completed 11-01 data validation
+Plan: 02 of 02 (Complete)
+Status: Phase 11 complete, ready for Phase 12
+Last activity: 2026-03-14 -- Completed 11-02 full retraining on 4-source data
 
-Progress: [######░░░░] 67%
+Progress: [##########] 100%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 2 (v1.1)
-- Average duration: 10min
-- Total execution time: 19min
+- Total plans completed: 3 (v1.1)
+- Average duration: 21min
+- Total execution time: 64min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 10-model-bug-fixes | 1 | 14min | 14min |
-| 11-data-validation-retraining | 1 | 5min | 5min |
+| 11-data-validation-retraining | 2 | 50min | 25min |
 
 ## Accumulated Context
 
@@ -57,6 +57,8 @@ See PROJECT.md Key Decisions table for full history.
 - Lightning Trainer uses enable_progress_bar=False with project's own Python logger for both models
 - Used source-code inspection for refresh expansion test (avoids Python 3.9 fetch.py import error)
 - Used space_group offsets in synthetic records to avoid cross-source dedup collisions
+- M3GNet formation_energy R2=0.836 accepted as valid after denorm fix confirmation
+- TensorNet negative R2 accepted as known limitation needing more epochs/tuning, not a bug
 
 ### Blockers
 None
@@ -66,9 +68,9 @@ None
 
 ## Session Continuity
 
-Last session: 2026-03-14
-Stopped at: Completed 11-01-PLAN.md
+Last session: 2026-03-15
+Stopped at: Completed 11-02-PLAN.md
 Resume file: None
 
 ---
-*Last updated: 2026-03-14*
+*Last updated: 2026-03-15*

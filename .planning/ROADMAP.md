@@ -27,7 +27,7 @@
 **Milestone Goal:** Fix known bugs, validate all data sources, retrain models, and update all project surfaces to reflect accurate state.
 
 - [x] **Phase 10: Model Bug Fixes** - Fix M3GNet/TensorNet denormalization and logging bugs so models produce valid results (completed 2026-03-14)
-- [ ] **Phase 11: Data Validation & Retraining** - Validate AFLOW/JARVIS fetchers end-to-end and retrain all models on 4-source combined data
+- [x] **Phase 11: Data Validation & Retraining** - Validate AFLOW/JARVIS fetchers end-to-end and retrain all models on 4-source combined data (completed 2026-03-15)
 - [ ] **Phase 12: Project Surfaces** - Update README, dashboard, and GitHub repo to reflect corrected results and full data coverage
 
 ## Phase Details
@@ -58,7 +58,7 @@ Plans:
 
 Plans:
 - [x] 11-01-PLAN.md — Validate AFLOW/JARVIS end-to-end through pipeline and fix refresh bug (completed 2026-03-14)
-- [ ] 11-02-PLAN.md — Retrain all models on 4-source combined dataset
+- [x] 11-02-PLAN.md — Retrain all models on 4-source combined dataset (completed 2026-03-15)
 
 ### Phase 12: Project Surfaces
 **Goal**: Every public-facing artifact accurately reflects the current state of the project with corrected results, all 4 data sources, and current architecture
@@ -83,8 +83,8 @@ Phases execute in numeric order: 10 -> 11 -> 12
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 10. Model Bug Fixes | 1/1 | Complete    | 2026-03-14 | - |
-| 11. Data Validation & Retraining | v1.1 | 1/2 | In progress | - |
+| 11. Data Validation & Retraining | 2/2 | Complete   | 2026-03-15 | - |
 | 12. Project Surfaces | v1.1 | 0/? | Not started | - |
 
 ---
-*Last updated: 2026-03-14 after phase 11 planning*
+*Last updated: 2026-03-15 after 11-02 completion*

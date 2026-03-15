@@ -16,7 +16,7 @@ Requirements for polish & correctness release. Each maps to roadmap phases.
 
 - [x] **DATA-01**: AFLOW fetcher validated end-to-end through the pipeline (fetch -> clean -> graph)
 - [x] **DATA-02**: JARVIS fetcher validated end-to-end through the pipeline (fetch -> clean -> graph)
-- [ ] **DATA-03**: All models retrained with 4-source combined dataset, metrics updated
+- [x] **DATA-03**: All models retrained with 4-source combined dataset, metrics updated
 
 ### Project Surfaces
 
@@ -45,7 +45,7 @@ None -- v1.1 is a polish milestone.
 | FIX-02 | Phase 10 | Complete |
 | DATA-01 | Phase 11 | Complete |
 | DATA-02 | Phase 11 | Complete |
-| DATA-03 | Phase 11 | Pending |
+| DATA-03 | Phase 11 | Complete |
 | SURF-01 | Phase 12 | Pending |
 | SURF-02 | Phase 12 | Pending |
 | SURF-03 | Phase 12 | Pending |
