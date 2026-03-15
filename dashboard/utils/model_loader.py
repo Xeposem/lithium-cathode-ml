@@ -23,6 +23,49 @@ PROPERTY_UNITS = {
     "energy_above_hull": "eV/atom",
 }
 BASELINE_TYPES = ["rf", "xgb"]
+GNN_TYPES = ["cgcnn", "m3gnet", "tensornet"]
+
+
+def get_best_models(results_base: str = "data/results") -> dict[str, str]:
+    """Determine the best model for each property based on lowest test MAE.
+
+    Scans all *_results.json files and returns a mapping of property name
+    to the model key with the lowest MAE.
+
+    Returns:
+        Dict mapping property name to best model key (e.g. {"voltage": "xgb"}).
+    """
+    import json
+
+    # Collect (property, model, mae) from all result files
+    all_metrics: dict[str, dict[str, float]] = {}
+    results_dir = Path(results_base)
+
+    for json_path in results_dir.rglob("*_results.json"):
+        try:
+            data = json.load(open(json_path))
+        except (json.JSONDecodeError, OSError):
+            continue
+
+        for prop, metrics in data.items():
+            if not isinstance(metrics, dict):
+                continue
+            # Direct metrics (GNN results): {prop: {model: {mae: ...}}}
+            for key, value in metrics.items():
+                if isinstance(value, dict):
+                    mae = value.get("mae") or value.get("test_mae")
+                    if mae is not None:
+                        all_metrics.setdefault(prop, {})[key] = mae
+                elif key in ("mae", "test_mae") and isinstance(value, (int, float)):
+                    # Flat format: {prop: {mae: ...}} — infer model from filename
+                    model = json_path.stem.replace("_results", "")
+                    all_metrics.setdefault(prop, {})[model] = value
+                    break
+
+    best: dict[str, str] = {}
+    for prop, model_maes in all_metrics.items():
+        best[prop] = min(model_maes, key=model_maes.get)  # type: ignore[arg-type]
+    return best
 
 
 def _cache_resource(func):
@@ -192,58 +235,149 @@ def load_gnn_model(
         return None
 
 
-def predict_from_composition(
-    formula: str,
-    results_base: str = "data/results",
-) -> dict:
-    """Predict properties from a composition formula using baseline models.
+def _load_formula_index(data_dir: str = "data/processed") -> dict[str, list[dict]]:
+    """Build an index mapping reduced formula to material records.
 
-    Featurizes the formula using Magpie descriptors, loads all available
-    baseline models, and returns predictions organized by property and model.
+    Loads materials.json once and indexes by reduced formula for fast lookup.
+    """
+    import json
+
+    from pymatgen.core import Composition
+
+    data_path = Path(data_dir) / "materials.json"
+    if not data_path.exists():
+        return {}
+
+    try:
+        with open(data_path) as f:
+            records = json.load(f)
+        if not isinstance(records, list):
+            records = records.get("data", [])
+    except (json.JSONDecodeError, OSError):
+        return {}
+
+    index: dict[str, list[dict]] = {}
+    for r in records:
+        try:
+            key = Composition(r["formula"]).reduced_formula
+            index.setdefault(key, []).append(r)
+        except Exception:
+            continue
+    return index
+
+
+# Apply Streamlit caching if available
+_load_formula_index = _cache_resource(_load_formula_index)
+
+
+def lookup_structure(
+    formula: str,
+    data_dir: str = "data/processed",
+) -> Optional[tuple[Any, dict]]:
+    """Look up the most stable known crystal structure for a composition.
+
+    Searches the local materials database for entries matching the given
+    reduced formula and returns the one with the lowest energy above hull.
 
     Args:
         formula: Chemical formula string (e.g. "LiFePO4").
-        results_base: Base results directory containing baselines/ subfolder.
+        data_dir: Path to processed data directory containing materials.json.
 
     Returns:
-        Nested dict: {property: {model_type: predicted_value}}.
-        Empty dict if no models are available.
+        Tuple of (pymatgen Structure, record dict) for the best match,
+        or None if no matching structure is found.
     """
-    baselines_dir = Path(results_base) / "baselines"
-    if not baselines_dir.exists():
-        logger.warning("Baselines directory not found: %s", baselines_dir)
-        return {}
+    from pymatgen.core import Composition, Structure
 
-    # Discover available model files
-    available = {}
-    for joblib_path in baselines_dir.glob("*.joblib"):
-        stem = joblib_path.stem  # e.g. "rf_voltage"
-        parts = stem.split("_", 1)
-        if len(parts) == 2:
-            model_type, prop = parts
-            available.setdefault(prop, []).append(model_type)
+    target = Composition(formula).reduced_formula
+    index = _load_formula_index(data_dir)
+    matches = index.get(target)
 
-    if not available:
-        logger.warning("No baseline model files found in %s", baselines_dir)
-        return {}
+    if not matches:
+        return None
 
-    # Featurize the composition
-    from cathode_ml.features.composition import featurize_compositions
+    # Pick the most stable structure (lowest energy_above_hull)
+    best = min(
+        matches,
+        key=lambda r: r.get("energy_above_hull") if r.get("energy_above_hull") is not None else float("inf"),
+    )
 
-    X, _ = featurize_compositions([formula])
+    try:
+        structure = Structure.from_dict(best["structure_dict"])
+        return structure, best
+    except Exception as exc:
+        logger.error("Failed to reconstruct structure for %s: %s", formula, exc)
+        return None
 
+
+def predict_from_composition(
+    formula: str,
+    results_base: str = "data/results",
+    data_dir: str = "data/processed",
+    configs_dir: str = "configs",
+) -> tuple[dict, Optional[dict]]:
+    """Predict properties from a composition formula using all available models.
+
+    Runs baseline models on Magpie descriptors. Also looks up the most stable
+    known crystal structure for the composition and runs GNN predictions if
+    a structure is found.
+
+    Args:
+        formula: Chemical formula string (e.g. "LiFePO4").
+        results_base: Base results directory.
+        data_dir: Path to processed data directory for structure lookup.
+        configs_dir: Directory with YAML config files for GNN models.
+
+    Returns:
+        Tuple of (results_dict, structure_info) where:
+            results_dict: {property: {model_type: predicted_value}}.
+            structure_info: dict with keys 'material_id', 'source',
+                'energy_above_hull', 'space_group' for the matched structure,
+                or None if no structure was found.
+    """
     results: dict = {}
-    for prop, model_types in available.items():
-        prop_results = {}
-        for mt in model_types:
-            model = load_baseline_model(mt, prop, results_base=results_base)
-            if model is not None:
-                pred = model.predict(X)
-                prop_results[mt] = float(pred[0])
-        if prop_results:
-            results[prop] = prop_results
 
-    return results
+    # --- Baseline predictions ---
+    baselines_dir = Path(results_base) / "baselines"
+    if baselines_dir.exists():
+        available = {}
+        for joblib_path in baselines_dir.glob("*.joblib"):
+            stem = joblib_path.stem
+            parts = stem.split("_", 1)
+            if len(parts) == 2:
+                model_type, prop = parts
+                available.setdefault(prop, []).append(model_type)
+
+        if available:
+            from cathode_ml.features.composition import featurize_compositions
+
+            X, _ = featurize_compositions([formula])
+
+            for prop, model_types in available.items():
+                for mt in model_types:
+                    model = load_baseline_model(mt, prop, results_base=results_base)
+                    if model is not None:
+                        pred = model.predict(X)
+                        results.setdefault(prop, {})[mt] = float(pred[0])
+
+    # --- GNN predictions via structure lookup ---
+    structure_info = None
+    match = lookup_structure(formula, data_dir=data_dir)
+    if match is not None:
+        structure, record = match
+        structure_info = {
+            "material_id": record.get("material_id"),
+            "source": record.get("source"),
+            "energy_above_hull": record.get("energy_above_hull"),
+            "space_group": record.get("space_group"),
+        }
+        gnn_results = predict_from_structure(
+            structure, results_base=results_base, configs_dir=configs_dir
+        )
+        for prop, preds in gnn_results.items():
+            results.setdefault(prop, {}).update(preds)
+
+    return results, structure_info
 
 
 def predict_from_structure(
