@@ -36,7 +36,10 @@ def featurize_compositions(
 
     # Featurize using Magpie preset (132 descriptors)
     featurizer = ElementProperty.from_preset("magpie")
-    df = featurizer.featurize_dataframe(df, col_id="composition", ignore_errors=True)
+    featurizer.set_n_jobs(1)
+    df = featurizer.featurize_dataframe(
+        df, col_id="composition", ignore_errors=True, pbar=False
+    )
 
     # Extract feature columns
     feature_labels = featurizer.feature_labels()
