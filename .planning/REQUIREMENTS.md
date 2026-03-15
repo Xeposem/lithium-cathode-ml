@@ -20,8 +20,8 @@ Requirements for polish & correctness release. Each maps to roadmap phases.
 
 ### Project Surfaces
 
-- [ ] **SURF-01**: README reflects accurate results, all 4 data sources, and current architecture
-- [ ] **SURF-02**: GitHub repo description and topics updated to reflect current project state
+- [x] **SURF-01**: README reflects accurate results, all 4 data sources, and current architecture
+- [x] **SURF-02**: GitHub repo description and topics updated to reflect current project state
 - [ ] **SURF-03**: Dashboard displays corrected model results, includes AFLOW/JARVIS data, all views accurate
 
 ## Future Requirements
@@ -46,8 +46,8 @@ None -- v1.1 is a polish milestone.
 | DATA-01 | Phase 11 | Complete |
 | DATA-02 | Phase 11 | Complete |
 | DATA-03 | Phase 11 | Complete |
-| SURF-01 | Phase 12 | Pending |
-| SURF-02 | Phase 12 | Pending |
+| SURF-01 | Phase 12 | Complete |
+| SURF-02 | Phase 12 | Complete |
 | SURF-03 | Phase 12 | Pending |
 
 **Coverage:**

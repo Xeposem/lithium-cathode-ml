@@ -84,7 +84,7 @@ Phases execute in numeric order: 10 -> 11 -> 12
 |-------|-----------|----------------|--------|-----------|
 | 10. Model Bug Fixes | 1/1 | Complete    | 2026-03-14 | - |
 | 11. Data Validation & Retraining | 2/2 | Complete    | 2026-03-15 | - |
-| 12. Project Surfaces | v1.1 | 0/2 | Not started | - |
+| 12. Project Surfaces | 1/2 | In Progress|  | - |
 
 ---
 *Last updated: 2026-03-14 after phase 12 planning*
