@@ -294,6 +294,35 @@ lithium-cathode-ml/
 └── requirements.txt             # Pinned dependencies
 ```
 
+## Future Work
+
+### Model Improvements
+
+- **Hyperparameter tuning** -- Systematic sweeps (grid search, Optuna) for all models; CGCNN and baselines likely have room to improve on voltage/capacity.
+- **Longer GNN training** -- TensorNet trained from scratch never converged; more epochs and learning rate scheduling could help. M3GNet fine-tuning could benefit from gradual layer unfreezing.
+- **Ensemble predictions** -- Combine RF + XGBoost + CGCNN via stacking or weighted averaging, since composition-based and structure-based models capture complementary information.
+- **Multi-task learning** -- Train a single GNN to predict all 4 properties jointly, sharing structural representations across tasks.
+
+### Data & Features
+
+- **More voltage/capacity data** -- Only 3,713 samples have voltage labels (all from Materials Project). Additional electrode databases or computing voltages from formation energy differences between charged/discharged pairs would directly improve the weakest predictions.
+- **Transfer learning for voltage** -- Frame voltage as an energy difference between lithiated and delithiated structures rather than single-structure regression.
+- **Additional featurizers** -- Orbital Field Matrix (OFM), SOAP descriptors, or learned element embeddings (MEGNet-style) alongside Magpie.
+- **Data augmentation** -- Symmetry-equivalent perturbations of crystal structures to expand the GNN training set.
+
+### New Capabilities
+
+- **Uncertainty quantification** -- Prediction confidence intervals via MC dropout (GNNs) or quantile regression (baselines), essential for real materials screening.
+- **Inverse design** -- Given target voltage/capacity ranges, search or generate candidate compositions using generative models (CDVAE, DiffCSP).
+- **Active learning** -- Identify compositions where model uncertainty is highest, query DFT calculations for those, and retrain to close the discovery loop.
+- **Explainability** -- SHAP values for baselines; GNN attention or gradient attribution to highlight which atoms and bonds drive predictions.
+
+### Engineering
+
+- **GPU training** -- Enable CUDA support for GNN training to reduce training time.
+- **CI/CD pipeline** -- Automated testing, model retraining on data updates, and dashboard deployment.
+- **API endpoint** -- Wrap predictions in a FastAPI service for programmatic access beyond the Streamlit dashboard.
+
 ## License
 
 Academic project -- not currently released under a formal license.
