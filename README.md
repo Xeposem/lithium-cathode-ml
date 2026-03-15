@@ -12,13 +12,14 @@ The result is a reproducible, end-to-end pipeline from raw data ingestion throug
 
 ## Data Sources
 
-The dataset is assembled from three complementary sources, each contributing different aspects of cathode characterization:
+The dataset is assembled from four complementary sources, each contributing different aspects of cathode characterization:
 
 - **Materials Project** (mp-api): Primary source providing lithium cathode electrode entries with full crystal structures, formation energies, and computed voltages. Accessed via the official Python client.
 - **OQMD** (REST API): Open Quantum Materials Database supplying supplementary DFT-computed properties for cross-validation and expanded coverage of the lithium oxide chemical space.
-- **Battery Data Genome** (CSV): Experimental battery cycling data providing measured capacity and voltage values that ground-truth computational predictions.
+- **AFLOW** (REST API): Automatic Flow for Materials Discovery database providing DFT-computed formation energies and structural data for lithium-containing compounds. Accessed via the AFLOW REST API.
+- **JARVIS** (REST API): Joint Automated Repository for Various Integrated Simulations providing DFT properties computed with OptB88vdW functional. Accessed via the JARVIS-Tools API.
 
-Records are deduplicated using source priority (Materials Project > OQMD > Battery Data Genome) to resolve conflicts when the same material appears in multiple databases. Compositional group splitting ensures that polymorphs (different structures of the same composition) never appear in both training and test sets, preventing data leakage.
+Records are deduplicated using source priority (Materials Project > OQMD > AFLOW > JARVIS) to resolve conflicts when the same material appears in multiple databases. Compositional group splitting ensures that polymorphs (different structures of the same composition) never appear in both training and test sets, preventing data leakage.
 
 ## Methodology
 
@@ -53,24 +54,20 @@ All models are evaluated on identical held-out test sets using three metrics:
 
 | Property | Best Model | MAE | R-squared |
 |---|---|---|---|
-| formation_energy_per_atom | -- | -- | -- |
-| voltage | -- | -- | -- |
-| capacity | -- | -- | -- |
-| energy_above_hull | -- | -- | -- |
-
-> **Note:** Values above are placeholders. Run the full pipeline (`python -m cathode_ml`) to populate results from your data. Actual metrics will be written to `data/results/` as JSON files.
+| formation_energy_per_atom | CGCNN | 0.0341 | 0.9952 |
+| voltage | XGBoost | 0.4336 | 0.6791 |
+| capacity | XGBoost | 49.2205 | 0.4351 |
+| energy_above_hull | CGCNN | 0.0211 | 0.6903 |
 
 If the evaluation pipeline has been executed, a visual comparison is available:
 
 ![Model Comparison](data/results/figures/bar_comparison.png)
 
-**Interpretation:** Graph neural networks (CGCNN, M3GNet, TensorNet) tend to outperform composition-only baselines on properties that depend strongly on crystal structure (e.g., formation energy, stability), where bond geometries and atomic environments carry information not captured by elemental statistics alone. For composition-dominated properties like voltage, traditional baselines remain competitive, suggesting that elemental chemistry is the primary driver.
+**Interpretation:** Trained on 46,389 records from 4 data sources (Materials Project, OQMD, AFLOW, JARVIS), graph neural networks (CGCNN, M3GNet, TensorNet) tend to outperform composition-only baselines on properties that depend strongly on crystal structure (e.g., formation energy, stability), where bond geometries and atomic environments carry information not captured by elemental statistics alone. For composition-dominated properties like voltage, traditional baselines remain competitive, suggesting that elemental chemistry is the primary driver.
 
 ## Dashboard
 
 The project includes a 6-page interactive Streamlit dashboard for exploring data, models, and predictions.
-
-<!-- TODO: Add dashboard screenshot after first run -->
 
 ### Pages
 
@@ -125,7 +122,7 @@ python -m cathode_ml
 
 **Pipeline stages:**
 
-1. **Fetch** -- Download and cache data from Materials Project, OQMD, and Battery Data Genome
+1. **Fetch** -- Download and cache data from Materials Project, OQMD, AFLOW, and JARVIS
 2. **Featurize** -- Composition descriptors and crystal graphs are computed inline during training
 3. **Train** -- Train all five model architectures on each target property
 4. **Evaluate** -- Generate comparison tables, bar charts, and learning curves
@@ -176,7 +173,8 @@ lithium-cathode-ml/
 │   │   ├── fetch.py             # Multi-source fetch orchestrator
 │   │   ├── mp_fetcher.py        # Materials Project client
 │   │   ├── oqmd_fetcher.py      # OQMD REST client
-│   │   ├── bdg_fetcher.py       # Battery Data Genome downloader
+│   │   ├── aflow_fetcher.py     # AFLOW REST client
+│   │   ├── jarvis_fetcher.py    # JARVIS-DFT client
 │   │   ├── clean.py             # Deduplication and outlier removal
 │   │   ├── cache.py             # Disk cache with hash-based keys
 │   │   └── schemas.py           # Data record schema definitions
